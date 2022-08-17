@@ -1,0 +1,274 @@
+<a class="breadcrumb" href="#!" onclick="$('#frameContent').load('admin-pages/newproj.html', function() {});">Adauga proiect nou</a>
+
+<div class="row" id="rowList">
+  <div class="col s12 m4">
+    <div class="card rounded fixedHeight">
+      <div class="card-content">
+        <span class="card-title bold" id="activeProjects"></span>
+        <p id="activeProjectsLabel"></p><br>
+        <div id="projectsProgressBar">Progres<span class="right" id="progressPBLabel"></span></div>
+        <div class="progress taller" id="workPBMain">
+          <div id="progressPB" class="determinate" style="width: 0%"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="col s12 m4">
+    <div class="card rounded fixedHeight">
+      <div class="card-content">
+        <span class="card-title bold" id="">Placeholder</span>
+        <div id=""></div>
+      </div>
+    </div>
+  </div>
+  <div class="col s12 m4">
+    <div class="card rounded fixedHeight">
+      <div class="card-content">
+        <span class="card-title bold" id="">Placeholder</span>
+        <div id=""></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<script>
+  function drawProjectProgressChart(elemid, progress, buget, label, barColor) {
+    var options = {
+      series: [{
+          data: [buget, progress]
+        }],
+          chart: {
+            type: 'bar',
+            height: '100px',
+            toolbar: {
+              show: false
+            }
+        },
+        plotOptions: {
+          bar: {
+            barHeight: '100%',
+            distributed: true,
+            horizontal: true,
+            dataLabels: {
+              position: 'top',
+            },
+          }
+        },
+        dataLabels: {
+          enabled: true,
+          offsetX: -6,
+          style: {
+            fontSize: '12px',
+            colors: ['#fff']
+          }
+        },
+        stroke: {
+          show: true,
+          width: 1,
+          colors: ['#fff']
+        },
+        tooltip: {
+          shared: true,
+          intersect: false
+        },
+        xaxis: {
+          categories: [`Buget (${buget}%)`, `Executat (${progress}%)`],
+          labels: {
+            show: false
+          },
+          axisBorder: {
+            show: false,
+          },
+          axisTicks: {
+            show: false
+          },
+          crosshairs: {
+            show: false
+          }
+        },
+        legend: {
+          show: false
+        },
+        colors: [barColor, '#3d85c6'],
+        tooltip: {
+          custom: function({series, seriesIndex, dataPointIndex, w}) {
+            return w.globals.tooltip.tooltipTitle.outerHTML;
+          }
+        }
+        };
+
+        var chart = new ApexCharts(document.querySelector(`#${elemid}`), options);
+        chart.render();
+  }
+  
+  $(document).ready(function() {
+    let prjBudget = [];
+    $.get("handler.php?r=init", function(data, status) {
+      let initData, prjProgress;
+      try {
+        initData = JSON.parse(data);
+        projectsObject = initData.projects;
+        phasesObject = initData.phases;
+        milestonesObject = initData.milestones;
+        prjProgress = initData.progress;
+        alltimesheetsObject = initData.timesheets;
+      }
+      catch (e) {
+        M.toast({html: e});
+      }
+
+      let timeSpent = {};
+      let progressReport = new Array();
+
+      alltimesheetsObject.forEach(ts => {
+        if (timeSpent[`${ts.project_id}-${ts.phase_id}-${ts.milestone_id}`] === undefined) {
+          timeSpent[`${ts.project_id}-${ts.phase_id}-${ts.milestone_id}`] = Number(ts.time);
+        } else {
+          timeSpent[`${ts.project_id}-${ts.phase_id}-${ts.milestone_id}`] += Number(ts.time);
+        }
+        if (prjBudget[ts.project_id] === undefined) {
+          prjBudget[ts.project_id] = Number(ts.time);
+        } else {
+          prjBudget[ts.project_id] += Number(ts.time);
+        }
+      });
+
+      let activeProjects = 0;
+      projectsObject.forEach(prj => {
+        if (prj.active == 0) return;
+        activeProjects++;
+        let phaseNo = 0;
+        phasesObject.forEach(phase => {
+          if (phase.proj_id == prj.id) phaseNo++;
+        });
+        if (phaseNo == 0) phaseNo = 1;
+
+        let milestoneNo = 0;
+        milestonesObject.forEach(milestone => {
+          if (milestone.proj_id == prj.id) milestoneNo++;
+        });
+        if (milestoneNo == 0) milestoneNo = 1;
+
+        let progressProj = 0;
+        prjProgress.forEach(progElem => {
+          if (progElem.project_id == prj.id) progressProj+=progElem.progress;
+        });
+
+        progressReport[prj.id] = ({progress: progressProj, multiplier: phaseNo * milestoneNo});
+      });
+
+      $('#activeProjects').html(activeProjects);
+      activeProjects == 1?$('#activeProjectsLabel').html('Proiect activ'):$('#activeProjectsLabel').html('Proiecte active');
+
+      let res = 0;
+      progressReport.forEach(element => {
+        res+=element.progress/element.multiplier;
+      });
+
+      let progressTotal = Math.ceil(res/activeProjects);
+
+      $('#progressPBLabel').html(`${progressTotal}%`);
+      $('#progressPB').css("width", `${progressTotal}%`);
+
+      projectsObject.forEach(prj => {
+        if (prj.active == 0) return;
+        $('#rowList').append(`
+          <div class="col s12 m6 l4" id="proj_div_${prj.id}" onclick="zoomProj(this.id)">
+            <div id="proj_card_${prj.id}" class="card rounded fixedHeight">
+              <div class="card-content">
+                <span class="card-title bold">${getDBNameFromId(prj.id, "project")}</span>
+                  <div id="prjProgress_${prj.id}" class="col s9"></div>
+                  <div id="prjEstimate_${prj.id}" class="col s3 valign-wrapper flexer" style="min-height: 115px;"></div>
+                  <div id="prjTimeSpent_${prj.id}" class="col s12 hide"><div>
+              </div>
+            </div>
+          </div>`);
+  let progressCompleted;
+  if (progressReport[prj.id].progress === undefined) {
+    progressCompleted=0;
+  } else {
+    progressCompleted=Math.ceil(progressReport[prj.id].progress/progressReport[prj.id].multiplier);
+  }
+  //let progressCompleted = Math.floor(Math.random() * 100);
+  //let budgetUsed = Math.floor(Math.random() * 100);
+  let budgetUsed = 0;
+  if (prjBudget[prj.id] !== undefined) {
+    if (prj.budget>0) {
+      budgetUsed = Math.ceil(prjBudget[prj.id]/prj.budget*100);
+    }
+  } else {
+    budgetUsed = 0;
+  }
+  let barColor = '#008000';
+  let pbraport = 0;
+  if (progressCompleted>0) {
+    pbraport = progressCompleted/budgetUsed;
+    let projEstimate = Math.floor((100 * budgetUsed/progressCompleted));
+  if (projEstimate<prj.budget) {
+    $(`#prjEstimate_${prj.id}`).html(`<div class="badge green accent-1 center-align">
+        <div class="badge-wrap">
+          <span class="badge-text green-text text-darken-1 bold">
+            <i class="bi bi-arrow-up-short"></i>
+            ${prj.budget-projEstimate} ${prj.budget-projEstimate==1?'ora':'ore'}
+          </span>
+        </div>
+      </div>`);
+  } else {
+    $(`#prjEstimate_${prj.id}`).html(`<div class="badge red lighten-4 center-align">
+        <div class="badge-wrap">
+          <span class="badge-text red-text red-darken-1 bold">
+            <i class="bi bi-arrow-down-short"></i>
+            ${projEstimate-prj.budget} ${projEstimate-prj.budget==1?'ora':'ore'}
+          </span>
+        </div>
+      </div>`);  }
+  }
+
+  if (progressCompleted==0 && budgetUsed>0) {
+    $(`#prjEstimate_${prj.id}`).html('Raporteaza executia pentru estimari');
+  }
+  if (pbraport>0.8 && pbraport<1) {
+    barColor = '#ffa500';  
+  }
+  if (pbraport<0.8) {
+    barColor = '#cc0000';
+  };
+  //console.log(progressCompleted, budgetUsed);
+  if (progressCompleted==0 && budgetUsed==0) {
+    $(`#prjProgress_${prj.id}`).html('Nu exista date introduse pentru acest proiect');
+  } else {
+    drawProjectProgressChart(`prjProgress_${prj.id}`, progressCompleted, budgetUsed, "Executie", barColor);
+  }
+      });
+      for (let projTime in timeSpent) {
+        let projNum = projTime.split('-')[0];
+        let phaseNum = projTime.split('-')[1];
+        let milestoneNum  = projTime.split('-')[2];
+        if (phaseNum == 0 && milestoneNum == 0) continue;
+        if (phaseNum==0) {
+          $(`#prjTimeSpent_${projNum}`).append(`<div class="col s3">${getDBNameFromId(milestoneNum, 'milestone')}</div>
+            <div class="progress taller col s8">
+            <div class="determinate" style="width: ${Math.ceil(timeSpent[projTime]/prjBudget[projNum]*100)}%"></div>
+          </div>
+            <div class="col s1 center">${Math.ceil(timeSpent[projTime]/prjBudget[projNum]*100)}%
+          </div>`);
+        } else if (milestoneNum==0) {
+          $(`#prjTimeSpent_${projNum}`).append(`<div class="col s3">${getDBNameFromId(phaseNum, 'phase')}</div>
+            <div class="progress taller col s8">
+            <div class="determinate" style="width: ${Math.ceil(timeSpent[projTime]/prjBudget[projNum]*100)}%"></div>
+          </div>
+            <div class="col s1 center">${Math.ceil(timeSpent[projTime]/prjBudget[projNum]*100)}%
+          </div>`);
+        } else {
+          $(`#prjTimeSpent_${projNum}`).append(`<div class="col s3">${getDBNameFromId(phaseNum, 'phase')} - ${getDBNameFromId(milestoneNum, 'milestone')}</div>
+            <div class="progress taller col s8">
+            <div class="determinate" style="width: ${Math.ceil(timeSpent[projTime]/prjBudget[projNum]*100)}%"></div>
+          </div>
+            <div class="col s1 center">${Math.ceil(timeSpent[projTime]/prjBudget[projNum]*100)}%
+          </div>`);
+        }
+      }
+    });
+  });
+</script>

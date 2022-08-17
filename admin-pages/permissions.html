@@ -1,0 +1,33 @@
+<table class="centered highlight">
+    <thead>
+      <tr>
+          <th>ID</th>
+          <th>Acces Admin</th>
+          <th>Proiecte Externe</th>
+          <th>Bonus zile speciale</th>
+          <th>Concediu</th>
+          <th>Pontaj</th>
+          <th>Raportari</th>
+      </tr>
+    </thead>
+    <tbody id="permissionsTable">
+    </tbody>
+  </table>
+  <table class="centered highlight">
+    <tbody>
+      <tr>
+        <td>
+          <a class="waves-effect waves-green btn" onclick="addPermissionGroup()">Adauga grup permisii</a>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+  <script>
+    $(document).ready(function() {
+        populatePermissions();
+        $('form').submit(function(event) {
+          doFormStuff();
+          event.preventDefault();
+        });
+    });
+  </script>

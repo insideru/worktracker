@@ -1,0 +1,466 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.8.3/font/bootstrap-icons.css">
+    <link rel="stylesheet" type="text/css" href="css/evo-calendar.c23ef0d967.css"/>
+    <link rel="stylesheet" type="text/css" href="css/evo-calendar.blueprint.c63a8ec54f.css"/>
+    <link rel="preconnect" href="https://fonts.googleapis.com"> 
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin> 
+    <link href="https://fonts.googleapis.com/css2?family=Source+Sans+Pro:wght@300;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/materialize.c526587f48.css">
+    <link rel="stylesheet" href="css/styles.c29ce3df9e.css">
+    <script src="js/wNumb.min.1f80cfaf4.js"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <script src="js/charts.eaa479024.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
+    <?php if ($account->permissions['bonus']) {echo '<script src="js/bonus.a9989cba0.js"></script>';} else {echo '<script src="scripts/no-bonus.js"></script>';}?>
+    </head>
+  <body>
+    <nav>
+      <div class="nav-wrapper">
+        <a href="?page=logout" class="right" style="padding-right: 10px;">Logout</a>
+        <ul id="nav-mobile" class="left">
+          <li><a href="#" data-target="slide-out" class="sidenav-trigger show-on-small hide-on-med-and-up"><i class="material-icons large">menu</i></a></li>
+          <li><a class="hide-on-small-only linkDashboard" href="#">Dashboard</a></li>
+          <li><a class="hide-on-small-only linkCalendar" href="#">Calendar</a></li>
+          <?php if ($account->permissions['timesheet']): ?>
+          <li><a class="hide-on-small-only linkPontaj" href="#">Ponteaza</a></li>
+          <?php endif; ?>
+          <?php if ($account->permissions['raport']): ?>
+          <li><a class="hide-on-small-only linkRaport" href="#">Raportari</a></li>
+          <?php endif; ?>
+          <?php if ($account->permissions['holiday']): ?>
+          <li><a class="hide-on-small-only linkConcediu" href="#">Concediu</a></li>
+          <?php endif; ?>
+          <?php if ($account->permissions['admin']): ?>
+          <li><a class="hide-on-small-only linkAdmin" href="/?page=admin">Admin</a></li>
+          <?php endif; ?>
+        </ul>
+      </div>
+    </nav>
+
+    <ul id="slide-out" class="sidenav">
+      <div class="row">
+        <h5 style="padding: 10px;">Buna <?php echo $account->getFirstName(); ?><a href="#" class="right" onclick="$('.sidenav').sidenav('close');"><i class="material-icons">close</i></a></h5>
+        <br>
+        <li><a href="#" class="linkDashboard">Dashboard</a></li>
+        <li><a href="#" class="linkCalendar">Calendar</a></li>
+        <?php if ($account->permissions['timesheet']): ?>
+        <li><a href="#" class="linkPontaj">Ponteaza</a></li>
+        <?php endif; ?>
+        <?php if ($account->permissions['raport']): ?>
+        <li><a href="#" class="linkRaport" href="#">Raportari</a></li>
+        <?php endif; ?>
+        <?php if ($account->permissions['holiday']): ?>
+        <li><a href="#" class="linkConcediu">Concediu</a></li>
+        <?php endif; ?>
+        <?php if ($account->permissions['admin']): ?>
+        <li><a href="/?page=admin" class="linkAdmin">Admin</a></li>
+        <?php endif; ?>
+        <br>
+        <li><a href="?page=logout">Logout</a></li>
+      </div>
+    </ul>
+
+    <div id="viewProj" class="modal">
+      <div class="modal-content">
+          <div id="viewProjBody">
+              
+          </div>
+      </div>
+  </div>
+    <div class="row">
+
+      <div class="col s12 m6 l6">
+        <div class="card">
+          <div class="card-content">
+            <span class="card-title">Notificari</span>
+            <p>Neimplementat</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="col s12 m6 l6">
+        <div class="card">
+          <div class="card-content">
+            <span class="card-title">Ore pontate azi<span class="right" id="prjEditPtnj"></span></span>
+            <p><div id="viewPontajChart" class="center-align"></div></p>
+          </div>
+        </div>
+      </div>
+
+      <div class="col s12 m12 l12 hide-on-small-and-down">
+        <div class="card">
+          <div class="card-content">
+            <span class="card-title">Status proiecte active</span>
+            <p><div id="projectsChart"></div></p>
+          </div>
+        </div>
+      </div>
+
+      <div class="row hide-on-med-and-up" id="rowList">
+        <div class="col s12 m4">
+          <div class="card rounded fixedHeight">
+            <div class="card-content">
+              <span class="card-title bold" id="activeProjects"></span>
+              <p id="activeProjectsLabel"></p><br>
+              <div id="projectsProgressBar">Progres<span class="right" id="progressPBLabel"></span></div>
+              <div class="progress taller" id="workPBMain">
+                <div id="progressPB" class="determinate" style="width: 0%"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+
+      <div class="col s12 m12 l12 hide hide-on-small-only">
+        <div class="card">
+          <div class="card-content">
+            <span class="card-title">Timeline Proiecte</span>
+            <p><div id="projectsTimeline"></div></p>
+          </div>
+        </div>
+      </div>
+
+      <div class="col s12 m6 l6 hide hide-on-small-only">
+        <div class="card">
+          <div class="card-content">
+            <span class="card-title">Activitati</span>
+            <p><div id="projectsActivityChart"></div></p>
+          </div>
+        </div>
+      </div>
+
+      <div class="col s12 m6 l6 hide hide-on-small-only">
+        <div class="card">
+          <div class="card-content">
+            <span class="card-title">Useri</span>
+            <p><div id="projectsCollabChart"></div></p>
+          </div>
+        </div>
+      </div>
+ 
+    </div>
+                
+    <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
+    <script type="text/javascript" src="js/scripts.62e94f610.js"></script>
+    <script type="text/javascript" src="js/evo-calendar.1b8259963.js"></script>
+    <?php echo '<script>var myID='.$account->getCollabID().';</script>'; ?>
+    <?php echo '<script>var potPonta='.($account->permissions['timesheet']?1:0).';</script>'; ?>
+<script>
+  function drawProjectProgressChart(elemid, progress, buget, label, barColor) {
+  var options = {
+  series: [{
+      data: [buget, progress]
+    }],
+      chart: {
+        type: 'bar',
+        height: '100px',
+        toolbar: {
+          show: false
+        }
+    },
+    plotOptions: {
+      bar: {
+        barHeight: '100%',
+        distributed: true,
+        horizontal: true,
+        dataLabels: {
+          position: 'top',
+        },
+      }
+    },
+    dataLabels: {
+      enabled: true,
+      offsetX: -6,
+      style: {
+        fontSize: '12px',
+        colors: ['#fff']
+      }
+    },
+    stroke: {
+      show: true,
+      width: 1,
+      colors: ['#fff']
+    },
+    tooltip: {
+      shared: true,
+      intersect: false
+    },
+    xaxis: {
+      categories: [`Buget (${buget}%)`, `Executat (${progress}%)`],
+      labels: {
+        show: false
+      },
+      axisBorder: {
+        show: false,
+      },
+      axisTicks: {
+        show: false
+      },
+      crosshairs: {
+        show: false
+      }
+    },
+    legend: {
+      show: false
+    },
+    colors: [barColor, '#3d85c6'],
+    tooltip: {
+      custom: function({series, seriesIndex, dataPointIndex, w}) {
+        return w.globals.tooltip.tooltipTitle.outerHTML;
+      }
+    }
+    };
+
+    var chart = new ApexCharts(document.querySelector(`#${elemid}`), options);
+    chart.render();
+  }
+  $(document).ready(function() {
+    var prjBudget = [];
+    addLinks();
+    $('.collapsible').collapsible();
+    $('.modal').modal();
+    $('.sidenav').sidenav();
+    
+    $.get("handler.php?r=init", function(data, status) {
+      let initData, prjProgress;
+      let orderedTime = [];
+      try {
+        initData = JSON.parse(data);
+        collabsObject = initData.collabs;
+        projectsObject = initData.projects;
+        activitiesObject = initData.activities;
+        milestonesObject = initData.milestones;
+        if (initData.hasOwnProperty('clients')) clientsObject = initData.clients;
+        if (initData.hasOwnProperty('projCats')) projCatsObject = initData.projCats;
+        phasesObject = initData.phases;
+        milestonesObject = initData.milestones;
+        prjProgress = initData.progress;
+        alltimesheetsObject = initData.timesheets;
+      }
+      catch (e) {
+        console.log(data);
+        M.toast({html: e});
+      }
+
+      let timeSpent = {};
+      let progressReport = new Array();
+
+      //console.log(phasesObject, milestonesObject);
+      //console.log(projectsObject, alltimesheetsObject, collabsObject);
+      drawProjectsChart();
+
+      let curDate = new Date();
+      let wrkMonth = Number(curDate.getMonth())+1;
+      let wrkDate = `${curDate.getFullYear()}-${wrkMonth>9?wrkMonth:'0'+wrkMonth}-${curDate.getDate()>9?curDate.getDate():'0'+curDate.getDate().toString()}`;
+      let amPontat = false;
+      
+      alltimesheetsObject.forEach(ts => {
+        if (ts.collab_id == myID) {
+          myTimesheets.push(ts);
+          if (ts.date == wrkDate) {
+            amPontat = true;
+          }
+        }
+
+      if (timeSpent[`${ts.project_id}-${ts.phase_id}-${ts.milestone_id}`] === undefined) {
+        timeSpent[`${ts.project_id}-${ts.phase_id}-${ts.milestone_id}`] = Number(ts.time);
+      } else {
+          timeSpent[`${ts.project_id}-${ts.phase_id}-${ts.milestone_id}`] += Number(ts.time);
+      }
+      if (prjBudget[ts.project_id] === undefined) {
+        prjBudget[ts.project_id] = Number(ts.time);
+      } else {
+        prjBudget[ts.project_id] += Number(ts.time);
+      }
+    });
+
+    for (let projTime in timeSpent) {
+        let projNum = Number(projTime.split('-')[0]);
+        let phaseNum = Number(projTime.split('-')[1]);
+        let milestoneNum = Number(projTime.split('-')[2]);
+
+        if (orderedTime[projNum] === undefined) orderedTime[projNum] = [];
+        if (orderedTime[projNum][milestoneNum] === undefined) orderedTime[projNum][milestoneNum] = {};
+        if (orderedTime[projNum][milestoneNum].total === undefined) { orderedTime[projNum][milestoneNum].total = Number(timeSpent[projTime]) } else { orderedTime[projNum][milestoneNum].total += Number(timeSpent[projTime]); }
+        orderedTime[projNum][milestoneNum][phaseNum] = Number(timeSpent[projTime]);
+    }
+
+      if (amPontat) {
+        drawPontajChart(wrkDate);
+        $("#prjEditPtnj").html(`<a class="waves-effect waves-light btn" onclick="editareWithDate('${wrkDate}')">Editare pontaj</a>`);
+      } else {
+        let markup = '<p>Nu ai pontat astazi</p><br>';
+        markup+='<a class="waves-effect waves-light btn" onclick="ponteazaWithDate(\''+wrkDate+'\')">Adauga pontaj</a>';
+        if (potPonta) {
+          $("#viewPontajChart").html(markup);
+        }
+      }
+      $('.tooltipped').tooltip();
+
+  let activeProjects = 0;
+  projectsObject.forEach(prj => {
+    if (prj.active == 0) return;
+    if (prj.type_id == 3) return;
+    activeProjects++;
+    let phaseNo = 0;
+    phasesObject.forEach(phase => {
+      if (phase.proj_id == prj.id) phaseNo++;
+    });
+    if (phaseNo == 0) phaseNo = 1;
+
+    let milestoneNo = 0;
+    milestonesObject.forEach(milestone => {
+      if (milestone.proj_id == prj.id) milestoneNo++;
+    });
+    if (milestoneNo == 0) milestoneNo = 1;
+
+    let progressProj = 0;
+    prjProgress.forEach(progElem => {
+      if (progElem.project_id == prj.id) progressProj+=Number(progElem.progress);
+    });
+
+    progressReport[prj.id] = ({progress: progressProj, multiplier: phaseNo * milestoneNo});
+  });
+
+  $('#activeProjects').html(activeProjects);
+  activeProjects == 1?$('#activeProjectsLabel').html('Proiect activ'):$('#activeProjectsLabel').html('Proiecte active');
+
+  let res = 0;
+  progressReport.forEach(element => {
+    res+=element.progress/element.multiplier;
+  });
+
+  let progressTotal = Math.ceil(res/activeProjects);
+
+  $('#progressPBLabel').html(`${progressTotal}%`);
+  $('#progressPB').css("width", `${progressTotal}%`);
+
+  projectsObject.forEach(prj => {
+  if (prj.active == 0) return;
+  if (prj.type_id == 3) return;
+  $('#rowList').append(`
+    <div class="col s12 m6 l4" id="proj_div_${prj.id}" onclick="zoomProj(this.id)">
+      <div id="proj_card_${prj.id}" class="card rounded flexer">
+        <div class="card-content">
+          <span class="card-title bold">${getDBNameFromId(prj.id, "project")}<span class="right" id="prjStats_${prj.id}"></span></span>
+            <div id="prjProgress_${prj.id}" class="col s9"></div>
+            <div id="prjEstimate_${prj.id}" class="col s3 valign-wrapper flexer center-align" style="min-height: 115px;"></div>
+            <div id="prjTimeSpent_${prj.id}" class="col s12 hide"><div>
+        </div>
+      </div>
+    </div>`);
+
+    if (prj.status != '') {
+      switch (prj.status) {
+        case 'In lucru': $(`#prjStats_${prj.id}`).html(`<div class="badge green darken-1 center-align">
+        <div class="badge-wrap">
+          <span class="badge-text white-text bold">In lucru</span>
+        </div>
+      </div>`);
+      break;
+      case 'In asteptare': $(`#prjStats_${prj.id}`).html(`<div class="badge orange darken-1 center-align">
+        <div class="badge-wrap">
+          <span class="badge-text white-text bold">In asteptare</span>
+        </div>
+      </div>`);
+      break;
+      }
+
+      let prjProgDetails;
+      prjProgress.forEach(prgrs => {
+
+      });
+    }
+
+  let progressCompleted;
+  if (progressReport[prj.id].progress === undefined) {
+    progressCompleted=0;
+  } else {
+    progressCompleted=Math.ceil(progressReport[prj.id].progress/progressReport[prj.id].multiplier);
+  }
+  //let progressCompleted = Math.floor(Math.random() * 100);
+  //let budgetUsed = Math.floor(Math.random() * 100);
+  let budgetUsed = 0;
+  if (prjBudget[prj.id] !== undefined) {
+    if (prj.budget>0) {
+      budgetUsed = Math.ceil(prjBudget[prj.id]/prj.budget*100);
+    }
+  } else {
+    budgetUsed = 0;
+  }
+
+  let barColor = '#008000';
+  let pbraport = 0;
+  if (progressCompleted>0) {
+    pbraport = progressCompleted/budgetUsed;
+    let projEstimate = Math.floor((100 * budgetUsed/progressCompleted));
+  if (projEstimate<prj.budget) {
+    $(`#prjEstimate_${prj.id}`).html(`<div class="badge green accent-1 center-align">
+        <div class="badge-wrap">
+          <span class="badge-text green-text text-darken-1 bold">
+            <i class="bi bi-arrow-up-short"></i>
+            ${prj.budget-projEstimate} ${prj.budget-projEstimate==1?'ora':'ore'}
+          </span>
+        </div>
+      </div>`);
+  } else {
+    $(`#prjEstimate_${prj.id}`).html(`<div class="badge red lighten-4 center-align">
+        <div class="badge-wrap">
+          <span class="badge-text red-text red-darken-1 bold">
+            <i class="bi bi-arrow-down-short"></i>
+            ${projEstimate-prj.budget} ${projEstimate-prj.budget==1?'ora':'ore'}
+          </span>
+        </div>
+      </div>`);  }
+  }
+
+  if (progressCompleted==0 && budgetUsed>0) {
+    $(`#prjEstimate_${prj.id}`).html('Raporteaza executia pentru estimari');
+  }
+  if (pbraport>0.8 && pbraport<1) {
+    barColor = '#ffa500';  
+  }
+  if (pbraport<0.8) {
+    barColor = '#cc0000';
+  };
+  //console.log(progressCompleted, budgetUsed);
+  if (progressCompleted==0 && budgetUsed==0) {
+    $(`#prjProgress_${prj.id}`).html('Nu exista date introduse pentru acest proiect');
+  } else {
+    drawProjectProgressChart(`prjProgress_${prj.id}`, progressCompleted, budgetUsed, "Executie", barColor);
+  }
+  if (orderedTime[prj.id] !== undefined) {
+    orderedTime[prj.id].forEach(ordr => {
+      if (orderedTime[prj.id].length==1) return;
+      if (prjBudget[prj.id] === undefined) return;
+      let milestoneNo = orderedTime[prj.id].indexOf(ordr);
+      $(`#prjTimeSpent_${prj.id}`).append(`<div class="col s3">${milestoneNo==0?'General':getDBNameFromId(milestoneNo, 'milestone')}</div>
+            <div class="progress taller col s8">
+            <div class="determinate" style="width: ${Math.ceil(orderedTime[prj.id][milestoneNo].total/prjBudget[prj.id]*100)}%"></div>
+          </div>
+            <div class="col s1 center">${Math.ceil(orderedTime[prj.id][milestoneNo].total/prjBudget[prj.id]*100)}%
+          </div>`);
+      if (Object.keys(orderedTime[prj.id][milestoneNo]).length==2) return;
+      for (let phaseID in orderedTime[prj.id][milestoneNo]) {
+        if (phaseID == 'total') continue;
+        $(`#prjTimeSpent_${prj.id}`).append(`<div class="col s3 offset-s1">${phaseID==0?'General':getDBNameFromId(phaseID, 'phase')}</div>
+            <div class="progress taller col s7">
+            <div class="determinate" style="width: ${Math.ceil(orderedTime[prj.id][milestoneNo][phaseID]/orderedTime[prj.id][milestoneNo].total*100)}%"></div>
+          </div>
+            <div class="col s1 center">${Math.ceil(orderedTime[prj.id][milestoneNo][phaseID]/orderedTime[prj.id][milestoneNo].total*100)}%
+          </div>`);
+      }
+    });
+  }
+  });
+        });
+      });
+    </script>
+  </body>
+</html>
+<?php if ($account->permissions['admin']) {echo '<script>isAdmin=true;</script>';}?>

@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link rel="stylesheet" type="text/css" href="css/evo-calendar.c23ef0d967.css"/>
+    <link rel="stylesheet" href="css/materialize.c526587f48.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com"> 
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin> 
+    <link href="https://fonts.googleapis.com/css2?family=Source+Sans+Pro:wght@300&display=swap" rel="stylesheet">
+    <script src="js/wNumb.min.1f80cfaf4.js"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <style href="css/styles.c29ce3df9e.css"></style>
+    </head>
+  <body>
+    <nav>
+      <div class="nav-wrapper">
+        <a href="?page=logout" class="right" style="padding-right: 10px;">Logout</a>
+        <ul id="nav-mobile" class="left">
+          <li><a href="#" data-target="slide-out" class="sidenav-trigger show-on-small hide-on-med-and-up"><i class="material-icons large">menu</i></a></li>
+          <li><a class="hide-on-small-only linkDashboard" href="#">Dashboard</a></li>
+          <li><a class="hide-on-small-only linkCalendar" href="#">Calendar</a></li>
+          <?php if ($account->permissions['timesheet']): ?>
+          <li><a class="hide-on-small-only linkPontaj" href="#">Ponteaza</a></li>
+          <?php endif; ?>
+          <?php if ($account->permissions['raport']): ?>
+          <li><a class="hide-on-small-only linkRaport" href="#">Raportari</a></li>
+          <?php endif; ?>
+          <?php if ($account->permissions['holiday']): ?>
+          <li><a class="hide-on-small-only linkConcediu" href="#">Concediu</a></li>
+          <?php endif; ?>
+          <?php if ($account->permissions['admin']): ?>
+          <li><a class="hide-on-small-only linkAdmin" href="/?page=admin">Admin</a></li>
+          <?php endif; ?>
+        </ul>
+      </div>
+    </nav>
+
+    <ul id="slide-out" class="sidenav">
+      <div class="row">
+        <h5 style="padding: 10px;">Buna <?php echo $account->getFirstName(); ?><a href="#" class="right" onclick="$('.sidenav').sidenav('close');"><i class="material-icons">close</i></a></h5>
+        <br>
+        <li><a href="#" class="linkDashboard">Dashboard</a></li>
+        <li><a href="#" class="linkCalendar">Calendar</a></li>
+        <?php if ($account->permissions['timesheet']): ?>
+        <li><a href="#" class="linkPontaj">Ponteaza</a></li>
+        <?php endif; ?>
+        <?php if ($account->permissions['raport']): ?>
+        <li><a href="#" class="linkRaport" href="#">Raportari</a></li>
+        <?php endif; ?>
+        <?php if ($account->permissions['holiday']): ?>
+        <li><a href="#" class="linkConcediu">Concediu</a></li>
+        <?php endif; ?>
+        <?php if ($account->permissions['admin']): ?>
+        <li><a href="/?page=admin" class="linkAdmin">Admin</a></li>
+        <?php endif; ?>
+        <br>
+        <li><a href="?page=logout">Logout</a></li>
+      </div>
+    </ul>
+
+      <div class="container">
+        <div class="row"></div>
+        <div class="row center-align">
+          <div class="col s12">
+            <div id="zileRamase" class="chips">
+            </div>
+          </div>
+        </div>
+        <div class="row">
+          <div class="input-field col s6">
+            <input id="startDate" type="text" class="datepicker" onclick="getHolidays()">
+            <label for="startDate">Prima zi</label>
+            <span class="helper-text" data-error="Alege o data corecta" data-success="">Alege prima zi de concediu</span>
+          </div>
+          <div class="input-field col s6">
+            <input id="endDate" type="text" class="datepicker" onclick="getHolidays()">
+            <label for="endDate">Ultima zi</label>
+            <span class="helper-text" data-error="Alege o data corecta" data-success="">Alege ultima zi de concediu</span>
+          </div>
+        </div>
+        <div class="row">
+          <a class="waves-effect waves-light btn" onclick="adaugaConcediu();">Adauga concediu</a>
+        </div>
+    </div>
+                
+    <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
+    <script type="text/javascript" src="js/scripts.62e94f610.js"></script>
+    <script>
+      function adaugaConcediu() {
+        $("#startDate").removeClass("valid invalid");
+        $("#endDate").removeClass("valid invalid");
+        if (validateConcediu()) {
+          let sd = getSelectedDate($("#startDate").val());
+          let ed = getSelectedDate($("#endDate").val());
+          var formData = {
+                'action'            : 'addDaysoff',
+                'startdate'         : sd,
+                'enddate'           : ed,
+                'number'            : nrZileLibere //getNoDaysOff(new Date(sd.split("-")[2], sd.split("-")[1], sd.split("-")[0]), new Date(ed.split("-")[2], ed.split("-")[1], ed.split("-")[0]))
+            };
+            if (nrZileLibere>zile_ramase) {
+              if (!confirm("Se depasesc zilele de concediu ramase! Continui?")) {
+                return;
+              }
+            }
+            $.ajax({
+                type        : 'POST', // define the type of HTTP verb we want to use (POST for our form)
+                url         : 'handler.php', // the url where we want to POST
+                data        : formData, // our data object
+                //dataType    : 'json', // what type of data do we expect back from the server
+                encode      : true,
+                success     : function(data) {
+                  if (data.substring(0,8)=="Failure:") {
+                    M.toast({html: data.substring(8)});
+                  }
+                  if (data.substring(0,8)=="Success:") {
+                    //e corecta ma
+                    window.location.href = location.protocol + "//" + location.host + dashboardPage;
+                  } else {
+                    M.toast({html: data});
+                  }
+                },
+                error: function(){
+                    //
+                }
+            });
+        }
+      }
+        
+      $(document).ready(function(){
+            //$('.datepicker').datepicker();
+            //$('.timepicker').timepicker();
+            //$('.collapsible').collapsible();
+            addLinks();
+            $('.sidenav').sidenav();
+            var elems = document.querySelectorAll('.datepicker');
+            var instances = M.Datepicker.init(elems, {
+                defaultDate: new Date(),    
+                setDefaultDate: true,
+                format: 'dd mmmm yyyy',
+                onClose: changeSelectedDate,
+                firstDay: 1,
+                i18n: {
+                    weekdays: ['Duminica','Luni','Marti','Miercuri','Joi','Vineri','Sambata'],
+                    weekdaysShort: ['Dum','Lun','Mar','Mie','Joi','Vin','Sam'],
+                    weekdaysAbbrev: ['D','L','M','M','J','V','S'],
+                    months: ['Ianuarie','Februarie','Martie','Aprilie','Mai','Iunie','Iulie','August','Septembrie','Octombrie','Noiembrie','Decembrie'],
+                    monthsShort: ['Ian','Feb','Mar','Apr','Mai','Iun','Iul','Aug','Sep','Oct','Noi','Dec']
+                }
+            });
+            $.get("handler.php?r=concediu", function(data, status) {
+            //console.log("Data: " + data + "\nStatus: " + status);
+            initData = JSON.parse(data);
+            holidayArray = [];
+            //zile_concediu = initData.concediu.zile_concediu;
+            //zile_report = initData.concediu.zile_report;
+            zile_ramase = initData.concediu.zile_ramase;
+            if (zile_ramase<0) {
+              $('#zileRamase').html('Ai depasit zilele de concediu alocate acestui an. Un numar de ' + (zile_ramase*-1) + (zile_ramase*-1 > 1 ? " zile vor fi scazute " : " zi va fi scazuta ") + 'din anul viitor');
+            }
+            if (zile_ramase == 0) {
+              $('#zileRamase').html('Nu mai ai nicio zi de concediu ramasa in acest an');
+            }
+            if (zile_ramase == 1) {
+              $('#zileRamase').html('Mai ai o singura zi de concediu ramasa in acest an');
+            }
+            if (zile_ramase > 1) {
+              $('#zileRamase').html('Mai ai ' + zile_ramase  + ' zile de concediu ramase in acest an');
+            }
+            
+            initData.holidays.forEach(element => {
+              dt = new Date(element.date);
+              dt.setHours(0, 0, 0);
+              holidayArray.push(dt);
+            });
+          });
+      });    
+    </script>
+  </body>
+</html>
+      

@@ -1,0 +1,74 @@
+<div class="row">
+  <div id="viewProj" class="modal">
+    <div class="modal-content">
+      <div id="viewProjBody">
+      </div>
+    </div>
+  </div>
+    <table class="centered highlight">
+      <thead>
+        <tr>
+          <th>Info</th>
+          <th>Nume</th>
+          <th>Categorie</th>
+          <th>Client</th>
+          <th>Extern</th>
+          <th>Buget</th>
+          <th>Data incepere</th>
+          <th>Deadline</th>
+          <th>Activ</th>
+        </tr>
+      </thead>
+      <tbody id="projTable">
+      </tbody>
+    </table>
+    <ul class="collapsible">
+      <li>
+        <div class="collapsible-header"><i class="material-icons">layers_clear</i>Proiecte inactive</div>
+        <div class="collapsible-body">
+          <table class="centered highlight">
+            <tbody id="projInactiveTable">
+            </tbody>
+          </table>
+        </div>
+      </li>
+    </ul>
+    <input type="hidden" id="newProjectStartDate" class="datepicker">
+    <input type="hidden" id="newProjectDeadline" class="datepicker">
+  </div>
+  <script>
+    $('#nav-bar').html(`<nav>
+      <div class="nav-wrapper">
+        <div class="col s12">
+          <a class="breadcrumb">Proiecte</a>
+          <a class="breadcrumb" href="#!" onclick="$('#frameContent').load('admin-pages/newproj.html', function() {});">Adauga proiect nou</a>
+        </div>
+      </div>
+    </nav>`);
+    $('#newProjectDeadline').change(function() {
+      setProjectDeadline($(this).val());
+    });
+    $('#newProjectStartDate').change(function() {
+      setProjectStartDate($(this).val());
+    });
+    $(document).ready(function() {
+        $('.modal').modal();
+        populateProjects();
+        $('.collapsible:not(.expandable)').collapsible();
+        var elems = document.querySelectorAll('.datepicker');
+          var instances = M.Datepicker.init(elems, {
+            defaultDate: new Date(),
+            setDefaultDate: true,
+            format: 'dd mmmm yyyy',
+            onClose: changeSelectedDate,
+            firstDay: 1,
+            i18n: {
+                weekdays: ['Duminica','Luni','Marti','Miercuri','Joi','Vineri','Sambata'],
+                weekdaysShort: ['Dum','Lun','Mar','Mie','Joi','Vin','Sam'],
+                weekdaysAbbrev: ['D','L','M','M','J','V','S'],
+                months: ['Ianuarie','Februarie','Martie','Aprilie','Mai','Iunie','Iulie','August','Septembrie','Octombrie','Noiembrie','Decembrie'],
+                monthsShort: ['Ian','Feb','Mar','Apr','Mai','Iun','Iul','Aug','Sep','Oct','Noi','Dec']
+            }
+          });
+    });
+  </script>

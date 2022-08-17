@@ -1,0 +1,72 @@
+<div id="fluturasSalariu" class="modal">
+    <div class="modal-content">
+      <h5 id="titluSalariu">Adauga utilizator</h5>
+      <div class="row"></div>
+      <div class="row">
+        <div class="col s12">
+          <table class="centered highlight">
+            <thead>
+              <tr>
+                <th>Tipul</th>
+                <th>Ore lucrate</th>
+                <th>Cost</th>
+                <th>Salariu</th>
+            </tr>
+            </thead>
+            <tbody id="fluturasBody">
+            </tbody>
+          </table>
+      </div>
+      <div class="modal-footer">
+        <a href="#!" class="waves-effect waves-green btn-flat modal-close">Inchide</a>
+      </div>
+    </div>
+  </div>
+  </div>
+  <table class="centered">
+    <tbody>
+      <tr>
+        <td>Alege luna de calcul</td>
+        <td><input id='calendarSalarii'></td>
+        <td><a class="waves-effect waves-teal btn-flat" onclick="calendarSalarii.prev(); calendarSalarii.setValue(calendarSalarii.getValue());"><i class="material-icons">navigate_before</i></a></td>
+        <td><a class="waves-effect waves-teal btn-flat" onclick="calendarSalarii.next(); calendarSalarii.setValue(calendarSalarii.getValue());"><i class="material-icons">navigate_next</i></a></td>
+      </tr>
+    </tbody>
+  </table>
+  <table class="centered highlight">
+    <thead>
+      <tr>
+        <th>Nume</th>
+        <th>1-15</th>
+        <th>16-Final</th>
+        <th>Salariu</th>
+    </tr>
+    </thead>
+    <tbody id="salariesBody">
+    </tbody>
+  </table>
+
+  <script>
+    var calendarSalarii;
+    $(document).ready(function () {
+        calendarSalarii = jSuites.calendar(document.getElementById('calendarSalarii'), {
+            type: 'year-month-picker',
+            format: 'MM-YYYY',
+            months: ['Ian', 'Feb', 'Mar', 'Apr', 'Mai', 'Iun', 'Iul', 'Aug', 'Sep', 'Oct', 'Noi', 'Dec'],
+            monthsFull: ['Ianuarie','Februarie','Martie','Aprilie','Mai','Iunie','Iulie','August','Septembrie','Octombrie','Noiembrie','Decembrie'],
+            textDone: 'OK',
+            textReset: 'Reset',
+            textUpdate: 'Update',
+            onchange: function(instance, value) {
+              calculateSalaries(value);
+            }
+          });
+        $('.modal').modal();
+        populateCollabs();
+        let today = new Date();
+        today.setTime( today.getTime() - today.getTimezoneOffset()*60*1000 );
+        let todayString = today.toISOString().replace('T', ' ');
+        todayString = todayString.substring(0, todayString.length-5);
+        calendarSalarii.setValue(todayString);
+    });
+  </script>

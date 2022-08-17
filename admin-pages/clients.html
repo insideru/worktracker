@@ -1,0 +1,33 @@
+<table class="centered highlight">
+    <thead>
+      <tr>
+          <th>Nume</th>
+      </tr>
+    </thead>
+    <tbody id="clientsTable">
+  </tbody>
+</table>
+<table class="centered highlight">
+  <tbody>
+      <tr>
+          <td>
+            <form id="addClientForm">
+                <div class="input-field">
+                    <i class="material-icons prefix">add</i>
+                    <input type="text" id="addClient" onclick="typeNo=5;" required>
+                    <label for="addClient">Adauga client nou</label>
+                </div>
+            </form>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+  <script>
+    $(document).ready(function() {
+        populateClients();
+        $('form').submit(function(event) {
+          doFormStuff();
+          event.preventDefault();
+        });
+    });
+  </script>

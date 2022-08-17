@@ -1,0 +1,617 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
+    <link rel="stylesheet" type="text/css" href="css/evo-calendar.c23ef0d967.css"/>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.8.3/font/bootstrap-icons.css">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link rel="stylesheet" href="css/materialize.c526587f48.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <link rel="preconnect" href="https://fonts.googleapis.com"> 
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin> 
+    <link href="https://fonts.googleapis.com/css2?family=Source+Sans+Pro:wght@300;600&display=swap" rel="stylesheet">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://jsuites.net/v4/jsuites.js"></script>
+    <link rel="stylesheet" href="https://jsuites.net/v4/jsuites.css" type="text/css" />
+    <script type="text/javascript" src="js/RowSorter.454ace665.js"></script>
+    <script type="text/javascript" src="js/jquery.dropdown.78494f6dc.js"></script>
+    <link type="text/css" rel="stylesheet" href="css/jquery.dropdown.c3da108782.css" />
+    <link rel="stylesheet" href="css/styles.c29ce3df9e.css">
+    <style>
+      header, main, footer, nav {
+      padding-left: 300px !important;
+    }
+
+    @media only screen and (max-width : 992px) {
+      header, main, footer, nav {
+        padding-left: 0 !important;
+      }
+    }
+
+    #nav-bar > nav > .nav-wrapper {
+      padding-left: 40px !important;
+    }
+
+    div.collapsible-body > ul > li.active > a > i {
+      color: #fff !important;
+    }
+
+    .wideContainer {
+      width: 90% !important;
+      max-width: none !important;
+    }
+
+    i.material-icons:not(tr>td>a>i.material-icons) {
+      pointer-events: none;
+    }
+
+    .genLista {
+      background-color: #328dcc !important;
+      color: #fff !important;
+    }
+
+    .genLista .material-icons {
+      color: #fff !important;
+    }
+    </style>
+  </head>
+    <body>
+      <!--<nav>
+        <div class="nav-wrapper">
+          <a href="?page=logout" class="right" style="padding-right: 10px;">Logout</a>
+          <ul id="nav-mobile" class="left">
+            <li><a href="#" data-target="slide-out" class="sidenav-trigger show-on-small hide-on-med-and-up"><i class="material-icons large">menu</i></a></li>
+            <li><a class="hide-on-small-only linkDashboard" href="#">Dashboard</a></li>
+            <li><a class="hide-on-small-only linkCalendar" href="#">Calendar</a></li>
+            <?php if ($account->permissions['timesheet']) {echo '<li><a class="hide-on-small-only linkPontaj" href="#">Ponteaza</a></li>';}?>
+            <?php if ($account->permissions['holiday']) {echo '<li><a class="hide-on-small-only linkConcediu" href="#">Concediu</a></li>';}?>
+            <?php if ($account->permissions['admin']) {echo '<li><a class="hide-on-small-only linkAdmin" href="/?page=admin">Admin</a></li>';}?>
+          </ul>
+        </div>
+      </nav>-->
+  
+      <!--<ul id="slide-out" class="sidenav">
+        <div class="row">
+          <h5 style="padding: 10px;">Buna <?php echo $account->getFirstName(); ?><a href="#" class="right" onclick="$('.sidenav').sidenav('close');"><i class="material-icons">close</i></a></h5>
+          <br>
+          <li><a href="#" class="linkDashboard">Dashboard</a></li>
+                <li><a href="#" class="linkCalendar">Calendar</a></li>
+                <?php if ($account->permissions['timesheet']) {echo '<li><a href="#" class="linkPontaj">Ponteaza</a></li>';}?>
+                <?php if ($account->permissions['holiday']) {echo '<li><a href="#" class="linkConcediu">Concediu</a></li>';}?>
+                <?php if ($account->permissions['admin']) {echo '<li><a href="/?page=admin" class="linkAdmin">Admin</a></li>';}?>
+                <br>
+          <li><a href="?page=logout">Logout</a></li>
+        </div>
+      </ul> -->
+      <div id="nav-bar"></div>
+      <ul id="sideBar" class="sidenav sidenav-fixed">
+        <!--<li><a href="#!">First Sidebar Link</a></li>-->
+        <li style="min-height: 225px"><img width="300px" src="img/admin-header.jpg"></li>
+        <li>
+          <a href="#!" class="genLista" onclick="loadMainBody(this)">Dashboard</a>
+        </li>
+        <li>
+          <a href="?page=dashboard">Pagina user</a>
+        </li>
+        <li class="no-padding">
+          <ul class="collapsible expandable">
+            <li class="active">
+              <a class="collapsible-header" onclick="changeArrow(this)">Proiecte<i class="material-icons">keyboard_arrow_down</i></a>
+              <div class="collapsible-body">
+                <ul>
+                  <li><a href="#!" onclick="loadMainBody(this)" id="projectMenu"><i class="material-icons tiny">list</i>Proiecte</a></li>
+                  <li><a href="#!" onclick="loadMainBody(this)"><i class="material-icons tiny">library_add</i>Categorii de proiecte</a></li>
+                  <li><a href="#!" onclick="loadMainBody(this)"><i class="material-icons tiny">library_books</i>Activitati</a></li>
+                </ul>
+              </div>
+            </li>
+            <li class="active">
+              <a class="collapsible-header" onclick="changeArrow(this)">Interne<i class="material-icons">keyboard_arrow_down</i></a>
+              <div class="collapsible-body">
+                <ul>
+                  <li><a href="#!" onclick="loadMainBody(this)"><i class="material-icons tiny">playlist_add</i>Pontaje</a></li>
+                  <li><a href="#!" onclick="loadMainBody(this)"><i class="material-icons tiny">monetization_on</i>Salarii</a></li>
+                  <li><a href="#!" onclick="loadMainBody(this)"><i class="material-icons tiny">beach_access</i>Zile libere</a></li>
+                </ul>
+              </div>
+            </li>
+            <li class="active">
+              <a class="collapsible-header" onclick="changeArrow(this)">Colaboratori<i class="material-icons">keyboard_arrow_down</i></a>
+              <div class="collapsible-body">
+                <ul>
+                  <li><a href="#!" onclick="loadMainBody(this)"><i class="material-icons tiny">recent_actors</i>Clienti</a></li>
+                  <li><a href="#!" onclick="loadMainBody(this)"><i class="material-icons tiny">group</i>Colaboratori</a></li>
+                  <li><a href="#!" onclick="loadMainBody(this)"><i class="material-icons tiny">format_list_bulleted</i>Categorii de colaboratori</a></li>
+                  <li><a href="#!" onclick="loadMainBody(this)"><i class="material-icons tiny">check_box</i>Grupuri de permisii</a></li>
+                  <li><a href="#!" onclick="loadMainBody(this)"><i class="material-icons tiny">person_pin</i>Utilizatori pontaj</a></li>
+                </ul>
+              </div>
+            </li>
+          </ul>
+        </li>
+        <li>
+          <a href="?page=logout">Logout</a>
+        </li>
+      </ul>
+      <a href="#" data-target="sideBar" class="sidenav-trigger"><i class="material-icons">menu</i></a>
+
+    <main>
+      <div class="container wideContainer">
+        <div class="row"></div>
+        <div class="card">
+          <div class="card-content">
+            <span class="card-title" id="frameTitle" style="font-weight: bold;">Dashboard</span>
+            <div id="frameContent">
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
+    <script type="text/javascript" src="js/scripts.62e94f610.js"></script>
+    <script type="text/javascript" src="js/charts.eaa479024.js"></script>
+    <script>
+      $(document).ready(function(){
+        $('.sidenav').sidenav();
+        let elem = document.querySelector('.collapsible.expandable');
+        let instance = M.Collapsible.init(elem, {
+          accordion: false
+        });
+        //initializare tabele
+        $.get("handler.php?r=init", function(data, status) {
+          //console.log("Data: " + data + "\nStatus: " + status);
+          try {
+          initData = JSON.parse(data);
+          clientsObject = initData.clients;
+          collabCatsObject = initData.collabCats;
+          projCatsObject = initData.projCats;
+          collabsObject = initData.collabs;
+          projectsObject = initData.projects;
+          activitiesObject = initData.activities;
+          holidaysObject = initData.holidays;
+          accountsObject = initData.accounts;
+          alltimesheetsObject = initData.timesheets;
+          salariesObject = initData.salaries;
+          attendanceObject = initData.attendance;
+          phasesObject = initData.phases;
+          milestonesObject = initData.milestones;
+          
+          let tmpObject = initData.permissions;
+          tmpObject.forEach(elem => {
+            permissionsObject[elem.id] = elem;
+          });
+          daysOffObject = initData.daysoff;
+
+          holidaysObject.forEach(element => {
+            dt = new Date(element.date);
+            dt.setHours(0, 0, 0, 0);
+            holidayArray.push(dt);
+          });
+        }
+        catch (e) {
+          M.toast({html: e});
+        }
+
+          $('.tooltipped').tooltip();
+          $("#frameContent").load("admin-pages/dashboard.html", function() {});
+        });
+      });
+
+      function changeArrow(elem) {
+        $(elem).html(function(index,text){
+          if (text.indexOf("_down") > -1) {
+            return text.replace('_down','_right');
+          } else {
+            return text.replace('_right','_down');
+          }
+        });
+      }
+
+      function loadMainBody(elem) {
+        $('#frameTitle').text(($(elem).justText()));
+        $('a').removeClass('genLista');
+        $(elem).addClass('genLista');
+        $('#nav-bar').html('');
+        editProject = 0;
+        switch ($(elem).justText()) {
+          case 'Dashboard':
+            $("#frameContent").load("admin-pages/dashboard.html", function() {});
+            break;
+          case 'Proiecte':
+            $("#frameContent").load("admin-pages/projects.html", function() {});
+            break;
+          case 'Categorii de proiecte':
+            $("#frameContent").load("admin-pages/proj-cats.html", function() {});
+            break;
+          case 'Activitati':
+            $("#frameContent").load("admin-pages/activities.html", function() {});
+            break;
+          case 'Pontaje':
+            $("#frameContent").load("admin-pages/heatmap.html", function() {});
+            break;
+          case 'Salarii':
+            $("#frameContent").load("admin-pages/salaries.html", function() {});
+            break;
+          case 'Zile libere':
+            $("#frameContent").load("admin-pages/holidays.html", function() {});
+            break;
+          case 'Colaboratori':
+            $("#frameContent").load("admin-pages/collabs.html", function() {});
+            break;
+          case 'Categorii de colaboratori':
+            $("#frameContent").load("admin-pages/collab-cats.html", function() {});
+            break;
+          case 'Grupuri de permisii':
+            $("#frameContent").load("admin-pages/permissions.html", function() {});
+            break;
+          case 'Utilizatori pontaj':
+            $("#frameContent").load("admin-pages/users.html", function() {});
+            break;
+          case 'Clienti':
+            $("#frameContent").load("admin-pages/clients.html", function() {});
+            break;
+        }
+        if (window.innerWidth < 993) {
+          let sideBarInstance = M.Sidenav.getInstance($('.sidenav'));
+          sideBarInstance.close();
+        }
+      }
+
+      /*jSuites.loading.show();
+      var calendarSalarii;
+      js_error = 0;
+      M.AutoInit();
+      selProjCat = "";
+      selProjCat2 = "";
+      selCollabCat = "";
+      selClient = "";
+
+      //if (!window.matchMedia('(max-width: 600px)').matches) {
+      //    $("#container").addClass("container");
+      //}
+
+        $( document ).ready(function() {
+          addLinks();
+          $('.sidenav').sidenav();
+          calendarSalarii = jSuites.calendar(document.getElementById('calendarSalarii'), {
+            type: 'year-month-picker',
+            format: 'MM-YYYY',
+            months: ['Ian', 'Feb', 'Mar', 'Apr', 'Mai', 'Iun', 'Iul', 'Aug', 'Sep', 'Oct', 'Noi', 'Dec'],
+            monthsFull: ['Ianuarie','Februarie','Martie','Aprilie','Mai','Iunie','Iulie','August','Septembrie','Octombrie','Noiembrie','Decembrie'],
+            textDone: 'OK',
+            textReset: 'Reset',
+            textUpdate: 'Update',
+            onchange: function(instance, value) {
+              calculateSalaries(value);
+            }
+          });
+    
+          var elems = document.querySelectorAll('.datepicker');
+            var instances = M.Datepicker.init(elems, {
+            defaultDate: new Date(),
+            setDefaultDate: true,
+            format: 'dd mmmm yyyy',
+            onClose: changeSelectedDate,
+            firstDay: 1,
+            i18n: {
+                weekdays: ['Duminica','Luni','Marti','Miercuri','Joi','Vineri','Sambata'],
+                weekdaysShort: ['Dum','Lun','Mar','Mie','Joi','Vin','Sam'],
+                weekdaysAbbrev: ['D','L','M','M','J','V','S'],
+                months: ['Ianuarie','Februarie','Martie','Aprilie','Mai','Iunie','Iulie','August','Septembrie','Octombrie','Noiembrie','Decembrie'],
+                monthsShort: ['Ian','Feb','Mar','Apr','Mai','Iun','Iul','Aug','Sep','Oct','Noi','Dec']
+            }
+        });
+        $('#newProjectDeadline').change(function() {
+          setProjectDeadline($(this).val());
+        });
+        $('#newProjectStartDate').change(function() {
+          setProjectStartDate($(this).val());
+        });
+        $('#heatmapDays').change(function() {
+          generateHeatMapData($(this).val());
+        });
+        $(document).ready(function(){
+          $('.modal').modal();
+        });
+        //initializare tabele
+        $.get("handler.php?r=init", function(data, status) {
+          //console.log("Data: " + data + "\nStatus: " + status);
+          initData = JSON.parse(data);
+          clientsObject = initData.clients;
+          collabCatsObject = initData.collabCats;
+          projCatsObject = initData.projCats;
+          collabsObject = initData.collabs;
+          projectsObject = initData.projects;
+          activitiesObject = initData.activities;
+          holidaysObject = initData.holidays;
+          accountsObject = initData.accounts;
+          alltimesheetsObject = initData.timesheets;
+          salariesObject = initData.salaries;
+          attendanceObject = initData.attendance;
+          phasesObject = initData.phases;
+          milestonesObject = initData.milestones;
+          
+          let tmpObject = initData.permissions;
+          tmpObject.forEach(elem => {
+            permissionsObject[elem.id] = elem;
+          });
+          daysOffObject = initData.daysoff;
+          //console.log(projectsObject, alltimesheetsObject, collabsObject);
+          drawProjectsChart();
+          //initializare categorii proiect
+          populateProjCat();
+
+          //initializare categorii colaboratori
+          populateColabCat();
+
+          //initializare clienti
+          populateClients();
+
+          //initializare colaboratori
+          populateCollabs();
+
+          //initializare proiecte
+          populateProjects();
+
+          //initializare activitati
+          populateActivities();
+
+          //initializare holidays
+          populateHolidays();
+
+          //initializare utilizatori
+          populateUsers();
+          //console.log(accountsObject);
+          populatePermissions();
+
+          holidaysObject.forEach(element => {
+            dt = new Date(element.date);
+            dt.setHours(0, 0, 0, 0);
+            holidayArray.push(dt);
+          });
+
+          generateHeatMapData(30);
+
+          $('.tooltipped').tooltip();
+
+          let today = new Date();
+          today.setTime( today.getTime() - today.getTimezoneOffset()*60*1000 );
+          let todayString = today.toISOString().replace('T', ' ');
+          todayString = todayString.substring(0, todayString.length-5);
+          calendarSalarii.setValue(todayString);
+          jSuites.loading.hide();
+        });
+                
+        $('form').submit(function(event) {
+          event.preventDefault();
+            elemName = "";
+            catID = "";
+            clientID = "";
+            switch (typeNo) {
+                case 1: //add project category
+                  elemName = $('input[id=addProjCategory]').val().trim();
+                  if (elemName == "") {
+                    M.toast({html: 'Numele categoriei nu poate fi gol!'});
+                    return;
+                  }
+                  if (elemName.trim() == "Toate") {
+                    M.toast({html: 'Acest nume nu poate fi folosit!'});
+                    return;
+                  }
+                  $('#addProjCategoryForm').trigger("reset");
+                  //$(':focus').blur();
+                  type = 'addProjCategory';
+                  break;
+
+                case 2: //add collaborator category
+                  elemName = $('input[id=addCollabCategory]').val().trim();
+                  if (elemName == "") {
+                    M.toast({html: 'Numele categoriei nu poate fi gol!'});
+                    return;
+                  }
+                  $('#addColabCatForm').trigger("reset");
+                  //$(':focus').blur();
+                  type = 'addCollabCategory';
+                  break;
+
+                  case 3: //add project
+                  if (selProjCat == "") {
+                    M.toast({html: 'Trebuie aleasa o categorie de proiect!'});
+                    return;
+                  }
+                  if (selClient == "") {
+                    M.toast({html: 'Trebuie ales un client!'});
+                    return;
+                  }
+                  elemName = $('input[id=addProjectName]').val().trim();
+                  if (elemName == "") {
+                    M.toast({html: 'Numele proiectului nu poate fi gol!'});
+                    return;
+                  }
+                  catID = getDBidFromName (selProjCat, "projCat");
+                  clientID = getDBidFromName (selClient, "projClient");
+                  $('#addProjForm').trigger("reset");
+                  //$(':focus').blur();
+                  type = 'addProject';
+                  break;
+
+                case 4: //add collaborator
+                  if (selCollabCat == "") {
+                    M.toast({html: 'Trebuie aleasa o categorie de colaborator!'});
+                    return;
+                  }
+                  elemName = $('input[id=addCollab]').val().trim();
+                  if (elemName == "") {
+                    M.toast({html: 'Numele colaboratorului nu poate fi gol!'});
+                    return;
+                  }
+                  catID = getDBidFromName (selCollabCat, "colabCat");
+                  $('#addColabForm').trigger("reset");
+                  //$(':focus').blur();
+                  type = 'addCollab';
+                  break;
+
+                case 5: //add client
+                  elemName = $('input[id=addClient]').val().trim();
+                  if (elemName == "") {
+                    M.toast({html: 'Numele clientului nu poate fi gol!'});
+                    return;
+                  }
+                  $('#addClientForm').trigger("reset");
+                  //$(':focus').blur();
+                  type = 'addClient';
+                  break;
+
+                case 6: //add activity
+                  elemName = $('input[id=addActivity]').val().trim();
+                  if (elemName == "") {
+                    M.toast({html: 'Numele activititatii nu poate fi gol!'});
+                    return;
+                  }
+                  if (selProjCat2 == "") {
+                    M.toast({html: 'Trebuie aleasa o categorie de proiect!'});
+                    return;
+                  }
+                  catID = getDBidFromName (selProjCat2, "projCat");
+                  $('#addActivityForm').trigger("reset");
+                  //$(':focus').blur();
+                  type = 'addActivity';
+                  break;
+
+                  case 7: //adauga zi libera
+                  elemName = $('input[id=addNameDayOff]').val().trim();
+                  if (elemName == "") {
+                    M.toast({html: 'Ziua trebuie sa aiba un nume!'});
+                    return;
+                  }
+                  date = $('input[id=addDayOff]').val();
+                  if (!validateDate(date)) {
+                    M.toast({html: 'Ziua nu are un format de data corect!'});
+                    return;
+                  }
+                  $('#addDaysoffForm').trigger("reset");
+                  //$(':focus').blur();
+                  type = "addHoliday";
+                  break;
+            }
+            //reseteaza formul
+            //$('form')[typeNo-1].reset();
+          if (typeNo==7) {
+            var formData = {
+                'action'            : 'addToDB',
+                'type'              : type,
+                'name'              : elemName.trim(),
+                'category'          : catID,
+                'client'            : clientID,
+                'data'              : getSelectedDate(date)
+            };
+          } else {
+            var formData = {
+                'action'            : 'addToDB',
+                'type'              : type,
+                'name'              : elemName.trim(),
+                'category'          : catID,
+                'client'            : clientID
+            };
+          }
+            $.ajax({
+                type        : 'POST', // define the type of HTTP verb we want to use (POST for our form)
+                url         : 'handler.php', // the url where we want to POST
+                data        : formData, // our data object
+                //dataType    : 'json', // what type of data do we expect back from the server
+                encode      : true,
+                success     : function(data) {
+                    if (data.substring(0,8)=="Success:") {
+                      dbID=data.substring(8);
+                      switch (typeNo) {
+                        case 1: //add project category
+                          $('#projCatTable').append('<tr><td onclick="renameName(this.innerHTML, \'project_types\')">'+elemName+"</td></tr>");
+                          $('#dropdown_categorie_proiect').html($('#dropdown_categorie_proiect').html()+'<li><a href="#!" onclick="changeProjectCategory(this.innerHTML)">'+elemName+'</a></li>');
+                          $('#dropdown_categorie_proiect2').html($('#dropdown_categorie_proiect2').html()+'<li><a href="#!" onclick="changeProjectCategory2(this.innerHTML)">'+elemName+'</a></li>');
+                          addedItem = {id: dbID, name: elemName};
+                          projCatsObject.push(addedItem);
+                          break;
+                        case 2: //add collaborator category
+                          $('#colabCatTable').append('<tr><td onclick="renameName(this.innerHTML, \'collab_groups\')">'+elemName+"</td></tr>");
+                          $('#dropdown_categorie_colaborator').html($('#dropdown_categorie_colaborator').html()+'<li><a href="#!" onclick="changeColabCategory(this.innerHTML)">'+elemName+'</a></li>');
+                          addedItem = {id: dbID, name: elemName};
+                          collabCatsObject.push(addedItem);
+                          break;
+                        case 3: //add project
+                          $('#projTable').append('<tr><td onclick="renameName(this.innerHTML, \'projects\')">'+elemName+'</td><td>'+getDBNameFromId(catID, "projCat")+'</td><td>'+getDBNameFromId(clientID, "projClient")+'</td><td><label><input type="checkbox" id="projNo_' + dbID + '" onclick="changeProjState(this.id)" checked="checked" /><span></span></label></td></tr>');
+                          addedItem = {id: dbID, name: elemName, type_id: catID, client_id: clientID, active: "1"};
+                          projectsObject.push(addedItem);
+                          break;
+                        case 4: //add collaborator
+                          $('#collabsTable').append('<tr><td onclick="renameName(this.innerHTML, \'collaborators\')">'+elemName+"</td><td>"+getDBNameFromId(catID, "colabCat")+'</td><td><a class="waves-effect waves-light btn modal-trigger btn-small" href="#newPontor" onclick="addNewUserID=' + dbID +'">Adauga user</a></td></tr>');
+                          addedItem = {id: dbID, name: elemName, collabCatID: catID};
+                          collabsObject.push(addedItem);
+                          break;
+                        case 5: //add client
+                          $('#clientsTable').append('<tr><td onclick="renameName(this.innerHTML, \'clients\')">'+elemName+"</td></tr>");
+                          $('#dropdown_client_proiect').html($('#dropdown_client_proiect').html()+'<li><a href="#!" onclick="changeClient(this.innerHTML)">'+elemName+'</a></li>');
+                          addedItem = {id: dbID, name: elemName};
+                          clientsObject.push(addedItem);
+                          break;
+                        case 6: //add activity
+                          $('#activityTable').append('<tr><td onclick="renameName(this.innerHTML, \'activities\')">'+elemName+'</td></td><td>'+getDBNameFromId(catID, "projCat")+'</td></tr>');
+                          addedItem = {id: dbID, name: elemName, project_type: catID};
+                          activitiesObject.push(addedItem);
+                          break;
+                        case 7: //add holiday
+                          $('#daysoffTable').append('<tr><td onclick="renameName(this.innerHTML, \'holidays\')">'+elemName+'</td></td><td>'+ date +'</td><td><i class="material-icons red-text" style="cursor:pointer" onClick="deleteHoliday(\'' + getSelectedISODate(date) + '\')">delete_forever</i></td></tr>');
+                          addedItem = {id: dbID, name: elemName, date: date};
+                          holidaysObject.push(addedItem);
+                          break;
+                      }
+                    }
+                    if (data.substring(0,14)=="Database error") {
+                      M.toast({html: data.substring(14)});
+                    }
+                },
+                error: function(){
+                    //
+                }
+            });
+        event.preventDefault();
+        });
+        //console.log('done');
+    });*/
+    </script>
+    <div id="saveLoadMenu" class="jq-dropdown jq-dropdown-tip jq-dropdown-anchor-right">
+      <ul class="jq-dropdown-menu" id="detailsMenuItems">
+          <li><a href="#1">Item 1<i class="material-icons tiny right red-text">delete</i></a></li>
+          <li><a href="#2">Item 2<i class="material-icons tiny right red-text">delete</i></a></li>
+          <li><a href="#3">Item 3<i class="material-icons tiny right red-text">delete</i></a></li>
+          <li class="jq-dropdown-divider"></li>
+          <li><a href="#4">Item 4</a></li>
+          <li><a href="#5">Item 5</a></li>
+          <li><a href="#5">Item 6</a></li>
+      </ul>
+  </div>
+  <div id="phasesMenu" class="jq-dropdown jq-dropdown-tip jq-dropdown-anchor-right">
+    <ul class="jq-dropdown-menu" id="phasesMenuItems">
+        <li><a href="#1">Item 1<i class="material-icons tiny right red-text">delete</i></a></li>
+        <li><a href="#2">Item 2<i class="material-icons tiny right red-text">delete</i></a></li>
+        <li><a href="#3">Item 3<i class="material-icons tiny right red-text">delete</i></a></li>
+        <li class="jq-dropdown-divider"></li>
+        <li><a href="#4">Item 4</a></li>
+        <li><a href="#5">Item 5</a></li>
+        <li><a href="#5">Item 6</a></li>
+    </ul>
+  </div>
+  <div id="milestonesMenu" class="jq-dropdown jq-dropdown-tip jq-dropdown-anchor-right">
+    <ul class="jq-dropdown-menu" id="milestonesMenuItems">
+        <li><a href="#1">Item 1<i class="material-icons tiny right red-text">delete</i></a></li>
+        <li><a href="#2">Item 2<i class="material-icons tiny right red-text">delete</i></a></li>
+        <li><a href="#3">Item 3<i class="material-icons tiny right red-text">delete</i></a></li>
+        <li class="jq-dropdown-divider"></li>
+        <li><a href="#4">Item 4</a></li>
+        <li><a href="#5">Item 5</a></li>
+        <li><a href="#5">Item 6</a></li>
+    </ul>
+  </div>
+    </body>
+</html>
+<?php if ($account->permissions['admin']) {echo '<script>isAdmin=true;</script>';}?>

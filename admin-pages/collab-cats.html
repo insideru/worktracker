@@ -1,0 +1,33 @@
+<table class="centered highlight">
+    <thead>
+      <tr>
+          <th>Nume</th>
+      </tr>
+    </thead>
+    <tbody id="colabCatTable">
+    </tbody>
+  </table>
+  <table class="centered highlight">
+    <tbody>
+      <tr>
+        <td>
+            <form id="addColabCatForm">
+                <div class="input-field">
+                    <i class="material-icons prefix">add</i>
+                    <input type="text" id="addCollabCategory" onclick="typeNo=2;" required>
+                    <label for="addCollabCategory">Adauga categorie noua</label>
+                </div>
+            </form>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+  <script>
+    $(document).ready(function() {
+        populateColabCat();
+        $('form').submit(function(event) {
+          doFormStuff();
+          event.preventDefault();
+        });
+    });
+  </script>

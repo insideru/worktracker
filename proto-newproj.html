@@ -1,0 +1,390 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com"> 
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin> 
+    <link href="https://fonts.googleapis.com/css2?family=Source+Sans+Pro:wght@300&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/materialize.c526587f48.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <script src="https://jsuites.net/v4/jsuites.js"></script>
+    <link rel="stylesheet" href="https://jsuites.net/v4/jsuites.css" type="text/css" />
+    <link type="text/css" rel="stylesheet" href="css/jquery.dropdown.c3da108782.css" />
+    <script type="text/javascript" src="js/jquery.dropdown.78494f6dc.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.8.3/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="css/styles.c29ce3df9e.css">
+    <script type="text/javascript" src="js/RowSorter.454ace665.js"></script>
+    </head>
+  <body>
+    <nav>
+      <div class="nav-wrapper">
+        <a href="?page=logout" class="right" style="padding-right: 10px;">Logout</a>
+        <ul id="nav-mobile" class="left">
+          <li><a href="#" data-target="slide-out" class="sidenav-trigger show-on-small hide-on-med-and-up"><i class="material-icons large">menu</i></a></li>
+          <li><a class="hide-on-small-only linkDashboard" href="#">Dashboard</a></li>
+          <li><a class="hide-on-small-only linkCalendar" href="#">Calendar</a></li>
+          <?php if ($account->permissions['timesheet']): ?>
+          <li><a class="hide-on-small-only linkPontaj" href="#">Ponteaza</a></li>
+          <?php endif; ?>
+          <?php if ($account->permissions['raport']): ?>
+          <li><a class="hide-on-small-only linkRaport" href="#">Raportari</a></li>
+          <?php endif; ?>
+          <?php if ($account->permissions['holiday']): ?>
+          <li><a class="hide-on-small-only linkConcediu" href="#">Concediu</a></li>
+          <?php endif; ?>
+          <?php if ($account->permissions['admin']): ?>
+          <li><a class="hide-on-small-only linkAdmin" href="/?page=admin">Admin</a></li>
+          <?php endif; ?>
+        </ul>
+      </div>
+    </nav>
+
+    <ul id="slide-out" class="sidenav">
+      <div class="row">
+        <h5 style="padding: 10px;">Buna <?php echo $account->getFirstName(); ?><a href="#" class="right" onclick="$('.sidenav').sidenav('close');"><i class="material-icons">close</i></a></h5>
+        <br>
+        <li><a href="#" class="linkDashboard">Dashboard</a></li>
+        <li><a href="#" class="linkCalendar">Calendar</a></li>
+        <?php if ($account->permissions['timesheet']): ?>
+        <li><a href="#" class="linkPontaj">Ponteaza</a></li>
+        <?php endif; ?>
+        <?php if ($account->permissions['raport']): ?>
+        <li><a href="#" class="linkRaport" href="#">Raportari</a></li>
+        <?php endif; ?>
+        <?php if ($account->permissions['holiday']): ?>
+        <li><a href="#" class="linkConcediu">Concediu</a></li>
+        <?php endif; ?>
+        <?php if ($account->permissions['admin']): ?>
+        <li><a href="/?page=admin" class="linkAdmin">Admin</a></li>
+        <?php endif; ?>
+        <br>
+        <li><a href="?page=logout">Logout</a></li>
+      </div>
+    </ul>
+
+    <div class="row">
+      <div class="col s12">
+        <div class="card">
+          <div class="card-content">
+            <a id="actionBtn" class="waves-effect waves-light btn btn-small right" onclick="checkNewProj(editProject)">Adauga Proiect</a>
+            <span class="card-title" id="projNameBig" style="font-weight: bold;">Proiect nou</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="col s12 m6 l4">
+        <div class="card">
+          <div class="card-content">
+            <span class="card-title">Informatii de baza</span>
+            <table class="centered">
+              <tbody>
+                <tr>
+                  <td width="30%">Nume proiect</td>
+                  <td class="center-align">
+                    <div class="input-field" style="margin: auto;">
+                      <input type="text" id="projName">
+                    </div>
+                  </td>
+                </tr>
+                <tr>
+                  <td width="30%">Categorie proiect</td>
+                  <td><div id="projType"></div></td>
+                </tr>
+                <tr>
+                  <td width="30%">Client</td>
+                  <td><div id="projClient"></div></td>
+                </tr>
+                <tr>
+                  <td width="30%">Tip proiect</td>
+                  <td><select class="browser-default" id="projExtern"><option value="Nada" disabled selected>Alege</option><option value="0">Intern</option><option value="1">Extern</option></select></td>
+                </tr>
+                <tr>
+                  <td width="30%">Buget</td>
+                  <td class="center-align">
+                    <div class="input-field" style="margin: auto;">
+                      <input type="text" id="projBudget">
+                    </div>
+                  </td>
+                </tr>
+                <tr>
+                  <td width="30%">Data incepere</td>
+                  <td><input style="text-align:center;" type="text" id="projStartDate" class="datepicker"></td>
+                </tr>
+                <tr>
+                  <td width="30%">Data terminare</td>
+                  <td><input style="text-align:center;" type="text" id="projDeadline" class="datepicker"></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+      <div class="col s12 m6 l4">
+        <div class="card">
+          <div class="card-content">
+            <span class="card-title">Detalii proiect<div class="right"><span data-jq-dropdown="#saveLoadMenu"><i class="bi bi-three-dots-vertical"></i></span></div></span>
+            <table class="centered" id="detailsTable">
+              <tbody id="detailsList">
+
+              </tbody>
+            </table>
+            <table class="centered">
+              <thead>
+                <tr>
+                  <td>Nume</td>
+                  <td>Tip</td>
+                  <td>Adauga</td>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>
+                    <div class="input-field">
+                    <input type="text" id="projDetailName" onkeypress="if (event.keyCode==13) addProjDetail();">
+                    </div>
+                  </td>
+                  <td><div id="addDetailType"></div></td>
+                  <td><a class="waves-effect waves-light btn-small" onclick="addProjDetail();">Adauga detaliu</a></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+      <div class="col s12 m6 l4">
+        <div class="card">
+          <div class="card-content">
+            <span class="card-title">Faze Proiect<div class="right"><span data-jq-dropdown="#phasesMenu"><i class="bi bi-three-dots-vertical"></i></span></div></span>
+            <table class="centered" id="phasesTable">
+              <tbody id="phasesList">
+
+              </tbody>
+            </table>
+            <table class="centered">
+              <thead>
+                <tr>
+                  <td>Nume</td>
+                  <td>Adauga</td>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>
+                    <div class="input-field">
+                    <input type="text" id="projPhaseName" onkeypress="if (event.keyCode==13) addProjPhase();">
+                    </div>
+                  </td>
+                  <td><a class="waves-effect waves-light btn-small" onclick="addProjPhase();">Adauga faza</a></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+      <div class="col s12 m6 l4">
+        <div class="card">
+          <div class="card-content">
+            <span class="card-title">Milestones<div class="right"><span data-jq-dropdown="#milestonesMenu"><i class="bi bi-three-dots-vertical"></i></span></div></span>
+            <table class="centered" id="milestonesTable">
+              <tbody id="milestonesList">
+
+              </tbody>
+            </table>
+            <table class="centered">
+              <thead>
+                <tr>
+                  <td>Nume</td>
+                  <td>Adauga</td>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>
+                    <div class="input-field">
+                    <input type="text" id="projMilestoneName"  onkeypress="if (event.keyCode==13) addProjMilestone();">
+                    </div>
+                  </td>
+                  <td><a class="waves-effect waves-light btn-small" onclick="addProjMilestone();">Adauga milestone</a></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
+    <script type="text/javascript" src="js/scripts.62e94f610.js"></script>
+    <script>
+      $(document).ready(function() {
+        addLinks();
+        $('.collapsible').collapsible();
+        $('.modal').modal();
+        $('.sidenav').sidenav();
+
+        jSuites.picker(document.getElementById('addDetailType'), {
+          data: ['Text', 'Da/Nu']});
+
+        $('#projName').keyup(function() {
+          $('#projNameBig').text($(this).val());
+        });
+
+        $('#detailsTable').rowSorter({
+          handler: 'i.sorter',
+          dragClass: 'sorting-row',
+          tableClass: 'sorting-table',
+          onDrop: function(tbody, row, new_index, old_index){
+            array_move(saveTemplateData, old_index, new_index);
+          }
+        });
+
+        $('#phasesTable').rowSorter({
+          handler: 'i.sorter',
+          dragClass: 'sorting-row',
+          tableClass: 'sorting-table',
+          onDrop: function(tbody, row, new_index, old_index){
+            array_move(savePhaseData, old_index, new_index);
+          }
+        });
+
+        $('#milestonesTable').rowSorter({
+          handler: 'i.sorter',
+          dragClass: 'sorting-row',
+          tableClass: 'sorting-table',
+          onDrop: function(tbody, row, new_index, old_index){
+            array_move(saveMilestoneData, old_index, new_index);
+          }
+        });
+
+        var elems = document.querySelectorAll('.datepicker');
+        var instances = M.Datepicker.init(elems, {
+        defaultDate: new Date(),
+        setDefaultDate: true,
+        format: 'dd mmmm yyyy',
+        onClose: changeSelectedDate,
+        firstDay: 1,
+        i18n: {
+            weekdays: ['Duminica','Luni','Marti','Miercuri','Joi','Vineri','Sambata'],
+            weekdaysShort: ['Dum','Lun','Mar','Mie','Joi','Vin','Sam'],
+            weekdaysAbbrev: ['D','L','M','M','J','V','S'],
+            months: ['Ianuarie','Februarie','Martie','Aprilie','Mai','Iunie','Iulie','August','Septembrie','Octombrie','Noiembrie','Decembrie'],
+            monthsShort: ['Ian','Feb','Mar','Apr','Mai','Iun','Iul','Aug','Sep','Oct','Noi','Dec']
+            }
+        });
+
+        $.get("handler.php?r=init", function(data, status) {
+          //console.log("Data: " + data + "\nStatus: " + status);
+          initData = JSON.parse(data);
+          clientsObject = initData.clients;
+          //collabCatsObject = initData.collabCats;
+          projCatsObject = initData.projCats;
+          templates = initData.templates;
+          populateTemplatesMenu();
+          var projCats = new Array;
+          projCatsObject.forEach(element => {
+            projCats.push({value: element.id, text: element.name});
+          });
+          
+          jSuites.dropdown(document.getElementById('projType'), {
+            data: projCats,
+            onchange: function(element, index) {
+              //idul selectat e Object.keys(index.value)[0];
+            },
+            //width:'280px'
+          });
+
+          var projClients = new Array;
+          clientsObject.forEach(element => {
+            projClients.push({value: element.id, text: element.name});
+          });
+          
+          jSuites.dropdown(document.getElementById('projClient'), {
+            data: projClients,
+            newOptions: true,
+            autocomplete: true,
+            lazyLoading: true,
+            onchange: function(element, index) {
+              //idul selectat e Object.keys(index.value)[0];
+            },
+            oninsert: function(instance, item) {
+              if (item.text == null || item.text.trim() == '') return 0;
+              var formData = {
+                'action'            : 'addToDB',
+                'type'              : 'addClient',
+                'name'              : item.text.trim()
+              };
+              $.ajax({
+                  url: 'handler.php',
+                  type: 'POST',
+                  encode: true,
+                  //dataType: 'json',
+                  data: formData,
+                  success: function(idFromTheServer) {
+                      if (idFromTheServer.substring(0,8) == "Success:") {
+                        // Set the item id from the number sent by the remote server
+                        instance.setId(item, idFromTheServer.substring(8));
+                        clientsObject.push({id: idFromTheServer.substring(8), name: item.text.trim()});
+                      }
+                  },
+                  error: function(errData) {
+                    M.toast({html: errData});
+                  }
+              });
+            },
+            //width:'280px',
+        });
+        
+        //check if it's edit
+        let URLParams = getParameters(window.location.search);
+        if (URLParams['edit'] !== undefined) {
+          try {
+            editProject = atob(URLParams['edit']);
+          }
+          catch (err) {
+            console.log(err);
+          }
+          if (editProject>0) {
+            $('#actionBtn').html('Modifica');
+            loadEditProjectData(editProject);
+          }
+        }
+        });
+      })
+    </script>
+    <?php if ($account->permissions['timesheet']) {echo '<script>addPontajButton=1;</script>';} else {echo '<script>addPontajButton=0;</script>';}?>
+    <div id="saveLoadMenu" class="jq-dropdown jq-dropdown-tip jq-dropdown-anchor-right">
+      <ul class="jq-dropdown-menu" id="detailsMenuItems">
+          <li><a href="#1">Item 1<i class="material-icons tiny right red-text">delete</i></a></li>
+          <li><a href="#2">Item 2<i class="material-icons tiny right red-text">delete</i></a></li>
+          <li><a href="#3">Item 3<i class="material-icons tiny right red-text">delete</i></a></li>
+          <li class="jq-dropdown-divider"></li>
+          <li><a href="#4">Item 4</a></li>
+          <li><a href="#5">Item 5</a></li>
+          <li><a href="#5">Item 6</a></li>
+      </ul>
+  </div>
+  <div id="phasesMenu" class="jq-dropdown jq-dropdown-tip jq-dropdown-anchor-right">
+    <ul class="jq-dropdown-menu" id="phasesMenuItems">
+        <li><a href="#1">Item 1<i class="material-icons tiny right red-text">delete</i></a></li>
+        <li><a href="#2">Item 2<i class="material-icons tiny right red-text">delete</i></a></li>
+        <li><a href="#3">Item 3<i class="material-icons tiny right red-text">delete</i></a></li>
+        <li class="jq-dropdown-divider"></li>
+        <li><a href="#4">Item 4</a></li>
+        <li><a href="#5">Item 5</a></li>
+        <li><a href="#5">Item 6</a></li>
+    </ul>
+  </div>
+  <div id="milestonesMenu" class="jq-dropdown jq-dropdown-tip jq-dropdown-anchor-right">
+    <ul class="jq-dropdown-menu" id="milestonesMenuItems">
+        <li><a href="#1">Item 1<i class="material-icons tiny right red-text">delete</i></a></li>
+        <li><a href="#2">Item 2<i class="material-icons tiny right red-text">delete</i></a></li>
+        <li><a href="#3">Item 3<i class="material-icons tiny right red-text">delete</i></a></li>
+        <li class="jq-dropdown-divider"></li>
+        <li><a href="#4">Item 4</a></li>
+        <li><a href="#5">Item 5</a></li>
+        <li><a href="#5">Item 6</a></li>
+    </ul>
+  </div>
+  </body>
+</html>
+      

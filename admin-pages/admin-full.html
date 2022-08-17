@@ -1,0 +1,676 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
+    <link rel="stylesheet" type="text/css" href="styles/evo-calendar.css"/>
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link rel="stylesheet" href="styles/materialize.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <link rel="preconnect" href="https://fonts.googleapis.com"> 
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin> 
+    <link href="https://fonts.googleapis.com/css2?family=Source+Sans+Pro:wght@300&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles/styles.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://jsuites.net/v4/jsuites.js"></script>
+    <link rel="stylesheet" href="https://jsuites.net/v4/jsuites.css" type="text/css" />
+  </head>
+    <body>
+      <nav>
+        <div class="nav-wrapper">
+          <a href="?page=logout" class="right" style="padding-right: 10px;">Logout</a>
+          <ul id="nav-mobile" class="left">
+            <li><a href="#" data-target="slide-out" class="sidenav-trigger show-on-small hide-on-med-and-up"><i class="material-icons large">menu</i></a></li>
+            <li><a class="hide-on-small-only linkDashboard" href="#">Dashboard</a></li>
+            <li><a class="hide-on-small-only linkCalendar" href="#">Calendar</a></li>
+            <?php if ($account->permissions['timesheet']) {echo '<li><a class="hide-on-small-only linkPontaj" href="#">Ponteaza</a></li>';}?>
+            <?php if ($account->permissions['holiday']) {echo '<li><a class="hide-on-small-only linkConcediu" href="#">Concediu</a></li>';}?>
+            <?php if ($account->permissions['admin']) {echo '<li><a class="hide-on-small-only linkAdmin" href="/?page=admin">Admin</a></li>';}?>
+          </ul>
+        </div>
+      </nav>
+  
+      <ul id="slide-out" class="sidenav">
+        <div class="row">
+          <h5 style="padding: 10px;">Buna <?php echo $account->getFirstName(); ?><a href="#" class="right" onclick="$('.sidenav').sidenav('close');"><i class="material-icons">close</i></a></h5>
+          <br>
+          <li><a href="#" class="linkDashboard">Dashboard</a></li>
+                <li><a href="#" class="linkCalendar">Calendar</a></li>
+                <?php if ($account->permissions['timesheet']) {echo '<li><a href="#" class="linkPontaj">Ponteaza</a></li>';}?>
+                <?php if ($account->permissions['holiday']) {echo '<li><a href="#" class="linkConcediu">Concediu</a></li>';}?>
+                <?php if ($account->permissions['admin']) {echo '<li><a href="/?page=admin" class="linkAdmin">Admin</a></li>';}?>
+                <br>
+          <li><a href="?page=logout">Logout</a></li>
+        </div>
+      </ul>
+
+        <div class="row"></div>
+        <div class="row">
+            <div class="col s12">
+              <ul class="tabs center-align">
+                <li class="tab"><a href="#dashboard" class="active" onclick="regenChart()">Dashboard</a></li>
+                <li class="tab"><a href="#proiecte">Proiecte</a></li>
+                <li class="tab"><a href="#clienti">Clienti si colaboratori</a></li>
+                <li class="tab"><a href="#pontaje">Pontaje si salarii</a></li>
+                <li class="tab"><a href="#venituri">Venituri si cheltuieli</a></li>
+              </ul>
+            </div>
+            <div id="dashboard" class="col s12">
+              <div class="card">
+                <div class="card-content">
+                  <div id="projectsChartDiv">
+                    <div id="projectsChart"></div>
+                </div>
+              </div>
+              </div>
+              <div class="row hide">
+                <div class="col s12">
+                  <div class="card">
+                    <div class="card-content">
+                      <div id="projectsTimeline"></div>
+                    </div>
+                  </div>
+                </div>
+                <div class="col s12 m12 l6 hide">
+                  <div class="card">
+                    <div class="card-content">
+                      <div id="projectsActivityChart"></div>
+                    </div>
+                  </div>
+                </div>
+                <div class="col s12 m12 l6 hide">
+                  <div class="card">
+                    <div class="card-content">
+                      <div id="projectsCollabChart"></div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div id="proiecte" class="col s12">
+                <div style="padding: 35px">
+                    <div class="row">
+                        <ul class="collapsible">
+                            <li>
+                            <div class="collapsible-header"><i class="material-icons">library_add</i>Categorii de proiecte</div>
+                            <div class="collapsible-body">
+                                <table class="centered highlight">
+                                    <thead>
+                                      <tr>
+                                          <th>Nume</th>
+                                      </tr>
+                                    </thead>
+                                    <tbody id="projCatTable">
+                                    </tbody>
+                                  </table>
+                                  <table class="centered highlight">
+                                    <tbody>
+                                      <tr>
+                                        <td>
+                                          <form id="addProjCategoryForm">
+                                              <div class="input-field">
+                                                  <i class="material-icons prefix">add</i>
+                                                  <input type="text" id="addProjCategory" onclick="typeNo=1;" required>
+                                                  <label for="addProjCategory">Adauga categorie noua</label>
+                                              </div>
+                                          </form>
+                                      </td>
+                                    </tr>
+                                    </tbody>
+                                  </table>
+                            </div>
+                            </li>
+                            <li>
+                              <div class="collapsible-header"><i class="material-icons">library_books</i>Activitati</div>
+                              <div class="collapsible-body">
+                                  <table class="centered highlight">
+                                      <thead>
+                                        <tr>
+                                            <th>Nume</th>
+                                            <th>Categorie</th>
+                                        </tr>
+                                      </thead>
+                                      <tbody id="activityTable">
+                                      </tbody>
+                                    </table>
+                                    <table class="centered highlight">
+                                      <tbody>
+                                        <tr>
+                                          <form id="addActivityForm">
+                                            <td><a class='dropdown-trigger btn' href='#' data-target='dropdown_categorie_proiect2' id="actProjCat">Categorie proiect</a></td>
+                                              <td>
+                                                  <div class="input-field">
+                                                      <i class="material-icons prefix">add</i>
+                                                      <input type="text" id="addActivity" onclick="typeNo=6;" required>
+                                                      <label for="addActivity">Adauga activitate noua</label>
+                                                  </div>
+                                              </td>
+                                          </form>
+                                        </tr>
+                                      </tbody>
+                                    </table>
+                              </div>
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="row">
+                      <div id="viewProj" class="modal">
+                        <div class="modal-content">
+                          <div id="viewProjBody">
+
+                          </div>
+                        </div>
+                      </div>
+                        <table class="centered highlight">
+                            <thead>
+                              <tr>
+                                  <th>Info</th>
+                                  <th>Nume</th>
+                                  <th>Categorie</th>
+                                  <th>Client</th>
+                                  <th>Extern</th>
+                                  <th>Buget</th>
+                                  <th>Data incepere</th>
+                                  <th>Deadline</th>
+                                  <th>Activ</th>
+                              </tr>
+                            </thead>
+                            <tbody id="projTable">
+                            </tbody>
+                          </table>
+                          <ul class="collapsible">
+                            <li>
+                              <div class="collapsible-header"><i class="material-icons">layers_clear</i>Proiecte inactive</div>
+                              <div class="collapsible-body">
+                                <table class="centered highlight">
+                                  <tbody id="projInactiveTable">
+                                  </tbody>
+                                </table>
+                              </div>
+                            </li>
+                          </ul>
+                          <table class="centered highlight">
+                            <tbody>
+                              <tr class="center-align">
+                                <td><a class="waves-effect waves-green btn" href="/?page=newProject">Adauga Proiect nou</a></td>
+                              </tr>
+                            </tbody>
+                          </table>
+                    </div>
+                </div>
+            </div>
+            <div id="clienti" class="col s12">
+                <div style="padding: 35px">
+                    <div class="row">
+                        <ul class="collapsible">
+                            <li>
+                            <div class="collapsible-header"><i class="material-icons">format_list_bulleted</i>Categorii de colaboratori</div>
+                            <div class="collapsible-body">
+                                <table class="centered highlight">
+                                    <thead>
+                                      <tr>
+                                          <th>Nume</th>
+                                      </tr>
+                                    </thead>
+                                    <tbody id="colabCatTable">
+                                    </tbody>
+                                  </table>
+                                  <table class="centered highlight">
+                                    <tbody>
+                                      <tr>
+                                        <td>
+                                            <form id="addColabCatForm">
+                                                <div class="input-field">
+                                                    <i class="material-icons prefix">add</i>
+                                                    <input type="text" id="addCollabCategory" onclick="typeNo=2;" required>
+                                                    <label for="addCollabCategory">Adauga categorie noua</label>
+                                                </div>
+                                            </form>
+                                        </td>
+                                      </tr>
+                                    </tbody>
+                                  </table>
+                            </div>
+                            </li>
+                            <li>
+                              <div class="collapsible-header"><i class="material-icons">check_box</i>Grupuri de permisii</div>
+                              <div class="collapsible-body">
+                                  <table class="centered highlight">
+                                      <thead>
+                                        <tr>
+                                            <th>ID</th>
+                                            <th>Acces Admin</th>
+                                            <th>Proiecte Externe</th>
+                                            <th>Bonus zile speciale</th>
+                                            <th>Concediu</th>
+                                            <th>Pontaj</th>
+                                        </tr>
+                                      </thead>
+                                      <tbody id="permissionsTable">
+                                      </tbody>
+                                    </table>
+                                    <table class="centered highlight">
+                                      <tbody>
+                                        <tr>
+                                          <td>
+                                            <a class="waves-effect waves-green btn" onclick="addPermissionGroup()">Adauga grup permisii</a>
+                                          </td>
+                                        </tr>
+                                      </tbody>
+                                    </table>
+                              </div>
+                              </li>
+                            <li>
+                                <div class="collapsible-header"><i class="material-icons">group</i>Colaboratori</div>
+                                <div class="collapsible-body">
+                                  <div id="newPontor" class="modal">
+                                    <div class="modal-content">
+                                      <h5>Adauga utilizator</h5>
+                                      <div class="row"></div>
+                                      <div class="row">
+                                        <div class="input-field col s12">
+                                          <input placeholder="username" id="userAdd" type="text" class="validate">
+                                          <label for="userAdd">Username</label>
+                                        </div>
+                                        <div class="input-field col s12">
+                                          <input placeholder="password" id="userPass1" type="password" class="validate">
+                                          <label for="userPass1">Password</label>
+                                        </div>
+                                        <div class="input-field col s12">
+                                          <input placeholder="password" id="userPass2" type="password" class="validate">
+                                          <label for="userPass2">Re-enter password</label>
+                                        </div>
+                                        <div class="input-field col s12">
+                                          <select id="userRights" class="browser-default">
+                                          </select>
+                                        </div>
+                                        <p id="addUserError"></p>
+                                      </div>
+                                      <div class="modal-footer">
+                                        <a href="#!" class="waves-effect waves-green btn-flat" onclick="validateAdduser()">Adauga</a>
+                                      </div>
+                                    </div>
+                                  </div>
+                                    <table class="centered highlight">
+                                        <thead>
+                                          <tr>
+                                              <th>Nume</th>
+                                              <th>Categorie</th>
+                                              <th>User</th>
+                                          </tr>
+                                        </thead>
+                                        <tbody id="collabsTable">
+                                        </tbody>
+                                      </table>
+                                      <table class="centered highlight">
+                                        <tbody>
+                                          <tr>
+                                            <form id="addColabForm">
+                                                <td><a class='dropdown-trigger btn' href='#' data-target='dropdown_categorie_colaborator' id="colabCat">Alege categorie</a></td>
+                                                <td>
+                                                  <div class="input-field">
+                                                      <i class="material-icons prefix">add</i>
+                                                      <input type="text" id="addCollab" onclick="typeNo=4;" required>
+                                                      <label for="addCollab">Adauga colaborator nou</label>
+                                                  </div>
+                                              </td>
+                                            </form>
+                                          </tr>
+                                        </tbody>
+                                      </table>
+                                </div>
+                                </li>
+                                <li>
+                                  <div class="collapsible-header"><i class="material-icons">person_pin</i>Utilizatori pontaj</div>
+                                  <div class="collapsible-body">
+                                    <div id="salaryModal" class="modal">
+                                      <div class="modal-content">
+                                        <h5 id="numeSalariat">Salariu colaborator</h5>
+                                        <div class="row"></div>
+                                        <div class="row">
+                                          <table class="centered highlight">
+                                            <thead>
+                                              <tr>
+                                                  <th>Salariu orar</th>
+                                                  <th>Salariu lunar</th>
+                                                  <th>Incepand cu data</th>
+                                                  <th>Modifica</th>
+                                              </tr>
+                                            </thead>
+                                            <tbody id="salaryTable">
+                                            </tbody>
+                                          </table>
+                                        </div>
+                                        <div class="row" id="addNewSalaryDiv">
+                                          <h5>Adauga intrare noua</h5>
+                                          <br>
+                                          <table class="centered highlight">
+                                            <tbody id="salaryAddTable">
+                                              <tr>
+                                              <td class="input-field">
+                                                <input style="text-align:center;" id="addHourlySalary" type="text" class="validate">
+                                                <label for="addHourlySalary">Salariu orar - 0 daca nu exista</label>
+                                              </td>
+                                              <td class="input-field">
+                                                <input style="text-align:center;" id="addMonthlySalary" type="text" class="validate">
+                                                <label for="addMonthlySalary">Salariu lunar - 0 daca nu exista</label>
+                                              </td>
+                                              <td class="input-field">
+                                                <input style="text-align:center;" type="text" id="addSalaryDate" class="datepicker">
+                                              </td>
+                                              <td>
+                                                <a class="waves-effect waves-light btn btn-small" onclick="addNewSalary(userID)">Adauga</a>
+                                              </td>
+                                              </tr>
+                                            </tbody>
+                                          </table>
+                                        </div>
+                                        <div class="modal-footer">
+                                          <a href="#!" class="modal-close waves-effect waves-green btn-flat">Inchide</a>
+                                        </div>
+                                      </div>
+                                    </div>
+                                      <table class="centered highlight">
+                                          <thead>
+                                            <tr>
+                                                <th>Username</th>
+                                                <th>Grup</th>
+                                                <th>Norma</th>
+                                                <th>Salariu</th>
+                                                <th>Concediu</th>
+                                                <th>Activ</th>
+                                            </tr>
+                                          </thead>
+                                          <tbody id="usersTable">
+                                          </tbody>
+                                      </table>
+                                    </div>
+                                  </li>
+                                <li>
+                                    <div class="collapsible-header"><i class="material-icons">recent_actors</i>Clienti</div>
+                                    <div class="collapsible-body">
+                                        <table class="centered highlight">
+                                            <thead>
+                                              <tr>
+                                                  <th>Nume</th>
+                                              </tr>
+                                            </thead>
+                                            <tbody id="clientsTable">
+                                          </tbody>
+                                        </table>
+                                        <table class="centered highlight">
+                                          <tbody>
+                                              <tr>
+                                                  <td>
+                                                    <form id="addClientForm">
+                                                        <div class="input-field">
+                                                            <i class="material-icons prefix">add</i>
+                                                            <input type="text" id="addClient" onclick="typeNo=5;" required>
+                                                            <label for="addClient">Adauga client nou</label>
+                                                        </div>
+                                                    </form>
+                                                </td>
+                                              </tr>
+                                            </tbody>
+                                          </table>
+                                    </div>
+                                    </li>
+                                    <li>
+                                      <div class="collapsible-header"><i class="material-icons">beach_access</i>Zile Libere</div>
+                                      <div class="collapsible-body">
+                                        <table class="centered highlight">
+                                          <thead>
+                                            <tr>
+                                                <th>Nume</th>
+                                                <th>Data</th>
+                                                <th>Sterge</th>
+                                            </tr>
+                                          </thead>
+                                          <tbody id="daysoffTable">
+                                          </tbody>
+                                      </table>
+                                      <form id="addDaysoffForm">
+                                      <div class="row valign-wrapper">
+                                        <div class="input-field col s5">
+                                          <i class="material-icons prefix">add</i>
+                                          <input type="text" id="addDayOff" onclick="typeNo=7;" required class="datepicker">
+                                          <label for="addDayOff">Data</label>
+                                        </div>
+                                        <div class="input-field col s5">
+                                          <input type="text" id="addNameDayOff" onclick="typeNo=7;" required>
+                                          <label for="addNameDayOff">Nume</label>
+                                        </div>
+                                        <div class="col s2">
+                                          <button class="btn waves-effect waves-light" type="submit" name="action">
+                                            <i class="material-icons right">send</i>
+                                          </button>
+                                        </div>
+                                      </form>
+                                      </div>
+                                    </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <div id="pontaje" class="col s12">
+              <div class="col s12">
+                <div class="card">
+                  <div class="card-content">
+                    <span class="card-title">Pontaje</span>
+                    <p><select id="heatmapDays">
+                      <option value="7">7 zile</option>
+                      <option value="30" selected>30 de zile</option>
+                      <option value="45">45 de zile</option>
+                      <option value="60">60 de zile</option>
+                      <option value="90">90 de zile</option>
+                    </select></p>
+                    <div id="heatMapChart"></div>
+                    <div class="row center-align"><h5 class ="col s12" id="numePontaj"></h5></div>
+                    <div id="pontajDetailChart"></div>
+                  </div>
+                </div>
+              </div>
+              <div class="col s12 m12 l6">
+                <div class="card">
+                  <div class="card-content">
+                    <span class="card-title">Calculator salarii</span>
+                    <div id="fluturasSalariu" class="modal">
+                      <div class="modal-content">
+                        <h5 id="titluSalariu">Adauga utilizator</h5>
+                        <div class="row"></div>
+                        <div class="row">
+                          <div class="col s12">
+                            <table class="centered highlight">
+                              <thead>
+                                <tr>
+                                  <th>Tipul</th>
+                                  <th>Ore lucrate</th>
+                                  <th>Cost</th>
+                                  <th>Salariu</th>
+                              </tr>
+                              </thead>
+                              <tbody id="fluturasBody">
+                              </tbody>
+                            </table>
+                        </div>
+                        <div class="modal-footer">
+                          <a href="#!" class="waves-effect waves-green btn-flat modal-close">Inchide</a>
+                        </div>
+                      </div>
+                    </div>
+                    </div>
+                    <table class="centered">
+                      <tbody>
+                        <tr>
+                          <td>Alege luna de calcul</td>
+                          <td><input id='calendarSalarii'></td>
+                          <td><a class="waves-effect waves-teal btn-flat" onclick="calendarSalarii.prev(); calendarSalarii.setValue(calendarSalarii.getValue());"><i class="material-icons">navigate_before</i></a></td>
+                          <td><a class="waves-effect waves-teal btn-flat" onclick="calendarSalarii.next(); calendarSalarii.setValue(calendarSalarii.getValue());"><i class="material-icons">navigate_next</i></a></td>
+                        </tr>
+                      </tbody>
+                    </table>
+                    <table class="centered highlight">
+                      <thead>
+                        <tr>
+                          <th>Nume</th>
+                          <th>1-15</th>
+                          <th>16-Final</th>
+                          <th>Salariu</th>
+                      </tr>
+                      </thead>
+                      <tbody id="salariesBody">
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div id="venituri" class="col s12">Neimplementat</div>
+          </div>
+  <!-- Dropdown Structure -->
+  <ul id='dropdown_categorie_proiect' class='dropdown-content'>
+  </ul>
+
+  <!-- Dropdown Structure -->
+  <ul id='dropdown_categorie_proiect2' class='dropdown-content'>
+  </ul>
+
+  <!-- Dropdown Structure -->
+  <ul id='dropdown_client_proiect' class='dropdown-content'>
+  </ul>
+
+  <!-- Dropdown Structure -->
+  <ul id='dropdown_categorie_colaborator' class='dropdown-content'>
+  </ul>
+
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
+    <script type="text/javascript" src="scripts/scripts.js"></script>
+    <script type="text/javascript" src="scripts/charts.js"></script>
+    <script>
+      jSuites.loading.show();
+      var calendarSalarii;
+      js_error = 0;
+      M.AutoInit();
+      selProjCat = "";
+      selProjCat2 = "";
+      selCollabCat = "";
+      selClient = "";
+
+      //if (!window.matchMedia('(max-width: 600px)').matches) {
+      //    $("#container").addClass("container");
+      //}
+
+        $( document ).ready(function() {
+          addLinks();
+          $('.sidenav').sidenav();
+          $('.modal').modal();
+          calendarSalarii = jSuites.calendar(document.getElementById('calendarSalarii'), {
+            type: 'year-month-picker',
+            format: 'MM-YYYY',
+            months: ['Ian', 'Feb', 'Mar', 'Apr', 'Mai', 'Iun', 'Iul', 'Aug', 'Sep', 'Oct', 'Noi', 'Dec'],
+            monthsFull: ['Ianuarie','Februarie','Martie','Aprilie','Mai','Iunie','Iulie','August','Septembrie','Octombrie','Noiembrie','Decembrie'],
+            textDone: 'OK',
+            textReset: 'Reset',
+            textUpdate: 'Update',
+            onchange: function(instance, value) {
+              calculateSalaries(value);
+            }
+          });
+    
+          var elems = document.querySelectorAll('.datepicker');
+            var instances = M.Datepicker.init(elems, {
+            defaultDate: new Date(),
+            setDefaultDate: true,
+            format: 'dd mmmm yyyy',
+            onClose: changeSelectedDate,
+            firstDay: 1,
+            i18n: {
+                weekdays: ['Duminica','Luni','Marti','Miercuri','Joi','Vineri','Sambata'],
+                weekdaysShort: ['Dum','Lun','Mar','Mie','Joi','Vin','Sam'],
+                weekdaysAbbrev: ['D','L','M','M','J','V','S'],
+                months: ['Ianuarie','Februarie','Martie','Aprilie','Mai','Iunie','Iulie','August','Septembrie','Octombrie','Noiembrie','Decembrie'],
+                monthsShort: ['Ian','Feb','Mar','Apr','Mai','Iun','Iul','Aug','Sep','Oct','Noi','Dec']
+            }
+        });
+        $('#newProjectDeadline').change(function() {
+          setProjectDeadline($(this).val());
+        });
+        $('#newProjectStartDate').change(function() {
+          setProjectStartDate($(this).val());
+        });
+        $('#heatmapDays').change(function() {
+          generateHeatMapData($(this).val());
+        });
+        
+        //initializare tabele
+        $.get("handler.php?r=init", function(data, status) {
+          //console.log("Data: " + data + "\nStatus: " + status);
+          initData = JSON.parse(data);
+          clientsObject = initData.clients;
+          collabCatsObject = initData.collabCats;
+          projCatsObject = initData.projCats;
+          collabsObject = initData.collabs;
+          projectsObject = initData.projects;
+          activitiesObject = initData.activities;
+          holidaysObject = initData.holidays;
+          accountsObject = initData.accounts;
+          alltimesheetsObject = initData.timesheets;
+          salariesObject = initData.salaries;
+          attendanceObject = initData.attendance;
+          phasesObject = initData.phases;
+          milestonesObject = initData.milestones;
+          
+          let tmpObject = initData.permissions;
+          tmpObject.forEach(elem => {
+            permissionsObject[elem.id] = elem;
+          });
+          daysOffObject = initData.daysoff;
+          //console.log(projectsObject, alltimesheetsObject, collabsObject);
+          drawProjectsChart();
+          //initializare categorii proiect
+          populateProjCat();
+
+          //initializare categorii colaboratori
+          populateColabCat();
+
+          //initializare clienti
+          populateClients();
+
+          //initializare colaboratori
+          populateCollabs();
+
+          //initializare proiecte
+          populateProjects();
+
+          //initializare activitati
+          populateActivities();
+
+          //initializare holidays
+          populateHolidays();
+
+          //initializare utilizatori
+          populateUsers();
+          //console.log(accountsObject);
+          populatePermissions();
+
+          holidaysObject.forEach(element => {
+            dt = new Date(element.date);
+            dt.setHours(0, 0, 0, 0);
+            holidayArray.push(dt);
+          });
+
+          generateHeatMapData(30);
+
+          $('.tooltipped').tooltip();
+
+          let today = new Date();
+          today.setTime( today.getTime() - today.getTimezoneOffset()*60*1000 );
+          let todayString = today.toISOString().replace('T', ' ');
+          todayString = todayString.substring(0, todayString.length-5);
+          calendarSalarii.setValue(todayString);
+          jSuites.loading.hide();
+        });
+        //console.log('done');
+    });
+    </script>
+  </body>
+</html>

@@ -1,0 +1,19 @@
+<div class="row"><select id="heatmapDays">
+    <option value="7">7 zile</option>
+    <option value="30" selected>30 de zile</option>
+    <option value="45">45 de zile</option>
+    <option value="60">60 de zile</option>
+    <option value="90">90 de zile</option>
+  </select></div>
+  <div id="heatMapChart"></div>
+  <div class="row center-align"><h5 class ="col s12" id="numePontaj"></h5></div>
+  <div id="pontajDetailChart"></div>
+  <script>
+    $(document).ready(function() {
+        $('#heatmapDays').change(function() {
+          generateHeatMapData($(this).val());
+        });
+        $('select').formSelect();
+        generateHeatMapData(30);
+    });
+  </script>

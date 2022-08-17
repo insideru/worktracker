@@ -1,0 +1,86 @@
+<div id="salaryModal" class="modal">
+    <div class="modal-content">
+      <h5 id="numeSalariat">Salariu colaborator</h5>
+      <div class="row"></div>
+      <div class="row">
+        <table class="centered highlight">
+          <thead>
+            <tr>
+                <th>Salariu orar</th>
+                <th>Salariu lunar</th>
+                <th>Incepand cu data</th>
+                <th>Modifica</th>
+            </tr>
+          </thead>
+          <tbody id="salaryTable">
+          </tbody>
+        </table>
+      </div>
+      <div class="row" id="addNewSalaryDiv">
+        <h5>Adauga intrare noua</h5>
+        <br>
+        <table class="centered highlight">
+          <tbody id="salaryAddTable">
+            <tr>
+            <td class="input-field">
+              <input style="text-align:center;" id="addHourlySalary" type="text" class="validate">
+              <label for="addHourlySalary">Salariu orar - 0 daca nu exista</label>
+            </td>
+            <td class="input-field">
+              <input style="text-align:center;" id="addMonthlySalary" type="text" class="validate">
+              <label for="addMonthlySalary">Salariu lunar - 0 daca nu exista</label>
+            </td>
+            <td class="input-field">
+              <input style="text-align:center;" type="text" id="addSalaryDate" class="datepicker">
+            </td>
+            <td>
+              <a class="waves-effect waves-light btn btn-small" onclick="addNewSalary(userID)">Adauga</a>
+            </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="modal-footer">
+        <a href="#!" class="modal-close waves-effect waves-green btn-flat">Inchide</a>
+      </div>
+    </div>
+  </div>
+    <table class="centered highlight">
+        <thead>
+          <tr>
+              <th>Username</th>
+              <th>Grup</th>
+              <th>Norma</th>
+              <th>Salariu</th>
+              <th>Concediu</th>
+              <th>Activ</th>
+          </tr>
+        </thead>
+        <tbody id="usersTable">
+        </tbody>
+    </table>
+    <script>
+    $(document).ready(function() {
+        populateUsers();
+        $('.modal').modal();
+        var elems = document.querySelectorAll('.datepicker');
+            var instances = M.Datepicker.init(elems, {
+            defaultDate: new Date(),
+            setDefaultDate: true,
+            format: 'dd mmmm yyyy',
+            onClose: changeSelectedDate,
+            firstDay: 1,
+            i18n: {
+                weekdays: ['Duminica','Luni','Marti','Miercuri','Joi','Vineri','Sambata'],
+                weekdaysShort: ['Dum','Lun','Mar','Mie','Joi','Vin','Sam'],
+                weekdaysAbbrev: ['D','L','M','M','J','V','S'],
+                months: ['Ianuarie','Februarie','Martie','Aprilie','Mai','Iunie','Iulie','August','Septembrie','Octombrie','Noiembrie','Decembrie'],
+                monthsShort: ['Ian','Feb','Mar','Apr','Mai','Iun','Iul','Aug','Sep','Oct','Noi','Dec']
+            }
+        });
+        $('form').submit(function(event) {
+          doFormStuff();
+          event.preventDefault();
+        });
+    });
+    </script>
