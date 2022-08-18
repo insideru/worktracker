@@ -38,6 +38,6 @@ if ($account->authenticated) {
     }
     else {
         //echo "Nu exista user logat";
-        require 'login.html';
+        require 'proto-login.html';
     }
 ?>
